@@ -84,11 +84,9 @@ public class Triangle implements Shape {
         }
 
         Triangle t = (Triangle) o;
-        double epsilon = 1e-10;
 
-        return Math.abs(t.x1 - x1) < epsilon && Math.abs(t.x2 - x2) < epsilon &&
-                Math.abs(t.x3 - x3) < epsilon && Math.abs(t.y1 - y1) < epsilon &&
-                Math.abs(t.y2 - y2) < epsilon && Math.abs(t.y3 - y3) < epsilon;
+        return t.x1 == x1 && t.x2 == x2 && t.x3 == x3 &&
+                t.y1 == y1 && t.y2 == y2 && t.y3 == y3;
     }
 
     private static double getMin(double[] array) {

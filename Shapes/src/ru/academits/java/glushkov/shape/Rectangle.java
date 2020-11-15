@@ -57,8 +57,7 @@ public class Rectangle implements Shape {
         }
 
         Rectangle r = (Rectangle) o;
-        double epsilon = 1e-10;
 
-        return Math.abs(r.width - width) < epsilon && Math.abs(r.height - height) < epsilon;
+        return r.width == width && r.height == height;
     }
 }

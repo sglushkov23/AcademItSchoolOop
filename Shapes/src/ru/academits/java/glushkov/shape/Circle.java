@@ -53,8 +53,7 @@ public class Circle implements Shape {
         }
 
         Circle c = (Circle) o;
-        double epsilon = 1e-10;
 
-        return Math.abs(c.radius - radius) < epsilon;
+        return c.radius == radius;
     }
 }

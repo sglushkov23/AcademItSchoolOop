@@ -53,8 +53,7 @@ public class Square implements Shape {
         }
 
         Square s = (Square) o;
-        double epsilon = 1e-10;
 
-        return Math.abs(s.side - side) < epsilon;
+        return s.side == side;
     }
 }
