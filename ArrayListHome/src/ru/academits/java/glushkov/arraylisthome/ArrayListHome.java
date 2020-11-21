@@ -24,7 +24,7 @@ public class ArrayListHome {
         System.out.println();
         System.out.println("2)");
 
-        ArrayList<Integer> list2 = new ArrayList<>(Arrays.asList(1,2,2,3,4,5,6,7,8,8,9));
+        ArrayList<Integer> list2 = new ArrayList<>(Arrays.asList(1, 2, 2, 3, 4, 5, 6, 7, 8, 8, 9));
         System.out.println("Исходный список:");
         System.out.println("list2 = " + list2);
 
@@ -42,7 +42,7 @@ public class ArrayListHome {
         System.out.println();
         System.out.println("3)");
 
-        ArrayList<Integer> list3 = new ArrayList<>(Arrays.asList(1,5,2,1,3,5));
+        ArrayList<Integer> list3 = new ArrayList<>(Arrays.asList(1, 5, 2, 1, 3, 5));
         ArrayList<Integer> list4 = new ArrayList<>();
 
         System.out.println("Список с повторениями list3 = " + list3);
