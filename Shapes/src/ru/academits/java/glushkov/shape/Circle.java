@@ -1,9 +1,17 @@
 package ru.academits.java.glushkov.shape;
 
 public class Circle implements Shape {
-    private final double radius;
+    private double radius;
 
     public Circle(double radius) {
+        this.radius = radius;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
         this.radius = radius;
     }
 
@@ -29,7 +37,7 @@ public class Circle implements Shape {
 
     @Override
     public String toString() {
-        return String.format("{ Shape type: Circle%n  radius = %.2f }", radius);
+        return String.format("{Circle: radius = %.2f}", radius);
     }
 
     @Override
@@ -48,7 +56,7 @@ public class Circle implements Shape {
             return true;
         }
 
-        if (o == null || o.getClass() != this.getClass()) {
+        if (o == null || o.getClass() != getClass()) {
             return false;
         }
 

@@ -1,35 +1,43 @@
 package ru.academits.java.glushkov.shape;
 
 public class Square implements Shape {
-    private final double side;
+    private double sideLength;
 
-    public Square(double side) {
-        this.side = side;
+    public Square(double sideLength) {
+        this.sideLength = sideLength;
+    }
+
+    public double getSideLength() {
+        return sideLength;
+    }
+
+    public void setSideLength(double sideLength) {
+        this.sideLength = sideLength;
     }
 
     @Override
     public double getWidth() {
-        return side;
+        return sideLength;
     }
 
     @Override
     public double getHeight() {
-        return side;
+        return sideLength;
     }
 
     @Override
     public double getArea() {
-        return side * side;
+        return sideLength * sideLength;
     }
 
     @Override
     public double getPerimeter() {
-        return side * 4;
+        return sideLength * 4;
     }
 
     @Override
     public String toString() {
-        return String.format("{ Shape type: Square%n  side = %.2f }", side);
+        return String.format("{Square: sideLength = %.2f}", sideLength);
     }
 
     @Override
@@ -37,7 +45,7 @@ public class Square implements Shape {
         final int prime = 37;
         int hash = 1;
 
-        hash = prime * hash + Double.hashCode(side);
+        hash = prime * hash + Double.hashCode(sideLength);
 
         return hash;
     }
@@ -48,12 +56,12 @@ public class Square implements Shape {
             return true;
         }
 
-        if (o == null || o.getClass() != this.getClass()) {
+        if (o == null || o.getClass() != getClass()) {
             return false;
         }
 
         Square s = (Square) o;
 
-        return s.side == side;
+        return s.sideLength == sideLength;
     }
 }

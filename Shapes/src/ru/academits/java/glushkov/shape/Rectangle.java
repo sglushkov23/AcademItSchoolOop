@@ -1,11 +1,19 @@
 package ru.academits.java.glushkov.shape;
 
 public class Rectangle implements Shape {
-    private final double width;
-    private final double height;
+    private double width;
+    private double height;
 
     public Rectangle(double width, double height) {
         this.width = width;
+        this.height = height;
+    }
+
+    public void setWidth(double width) {
+        this.width = width;
+    }
+
+    public void setHeight(double height) {
         this.height = height;
     }
 
@@ -31,8 +39,7 @@ public class Rectangle implements Shape {
 
     @Override
     public String toString() {
-        return String.format("{ Shape type: Rectangle%n  width = %.2f%n  height = %.2f }",
-                width, height);
+        return String.format("{Rectangle: width = %.2f; height = %.2f}", width, height);
     }
 
     @Override
@@ -52,7 +59,7 @@ public class Rectangle implements Shape {
             return true;
         }
 
-        if (o == null || o.getClass() != this.getClass()) {
+        if (o == null || o.getClass() != getClass()) {
             return false;
         }
 
