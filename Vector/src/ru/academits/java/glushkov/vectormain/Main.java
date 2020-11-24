@@ -1,4 +1,6 @@
-package ru.academits.java.glushkov.vector;
+package ru.academits.java.glushkov.vectormain;
+
+import ru.academits.java.glushkov.vector.Vector;
 
 public class Main {
     public static void main(String[] args) {
@@ -98,7 +100,7 @@ public class Main {
         System.out.println("Исходный вектор:");
         System.out.println("v11 = " + v11);
 
-        v11.multiplyBy(2);
+        v11.multiplyByScalar(2);
 
         System.out.println("После умножения вектора v11 на скаляр 2:");
         System.out.println("v11 = " + v11);
@@ -131,9 +133,9 @@ public class Main {
         System.out.println("Исходный вектор:");
         System.out.println("v14 = " + v14);
 
-        System.out.println("Значение компоненты вектора v14 по индексу 2 = " + v14.getAt(2));
+        System.out.println("Значение компоненты вектора v14 по индексу 2 = " + v14.getCoordinate(2));
 
-        v14.setAt(1, 37);
+        v14.setCoordinate(1, 37);
 
         System.out.println("После установки значения 37 по индексу 1:");
         System.out.println("v14 = " + v14);
@@ -145,6 +147,11 @@ public class Main {
         Vector v16 = new Vector(new double[]{2, 5, 11, 13, 4});
         Vector v17 = new Vector(new double[]{2, 5, 11, 13});
 
+        System.out.println("v15 = " + v15);
+        System.out.println("v16 = " + v16);
+        System.out.println("v17 = " + v17);
+
+        System.out.println();
         System.out.println("Проверка на равенство вектора v15 с самим собой: " + v15.equals(v15));
         System.out.println("Проверка на равенство вектора v16 с самим собой: " + v16.equals(v16));
         System.out.println("Проверка на равенство вектора v17 с самим собой: " + v17.equals(v17));
@@ -156,9 +163,9 @@ public class Main {
         System.out.println("Проверка на равенство векторов v17 и v16: " + v17.equals(v16));
 
         System.out.println();
-        System.out.println("Хэш-код для вектора v15:" + v15.hashCode());
-        System.out.println("Хэш-код для вектора v16:" + v16.hashCode());
-        System.out.println("Хэш-код для вектора v17:" + v17.hashCode());
+        System.out.println("Хэш-код для вектора v15: " + v15.hashCode());
+        System.out.println("Хэш-код для вектора v16: " + v16.hashCode());
+        System.out.println("Хэш-код для вектора v17: " + v17.hashCode());
 
         System.out.println();
         System.out.println("5) Тестирование статических методов:");
