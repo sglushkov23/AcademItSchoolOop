@@ -101,7 +101,7 @@ public class Matrix {
         Vector column = new Vector(this.getSize()[0]);
 
         for (int i = 0; i < this.getSize()[0]; i++) {
-            column.setAt(i, matrix[i].getAt(index));
+            column.setCoordinate(i, matrix[i].getCoordinate(index));
         }
 
         return column;
@@ -122,7 +122,7 @@ public class Matrix {
         int rowsCount = this.getSize()[0];
 
         for (int i = 0; i < rowsCount; i++) {
-            matrix[i].multiplyBy(number);
+            matrix[i].multiplyByScalar(number);
         }
     }
 
@@ -138,7 +138,7 @@ public class Matrix {
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                matrix[i][j] = this.matrix[i].getAt(j);
+                matrix[i][j] = this.matrix[i].getCoordinate(j);
             }
         }
 
@@ -201,7 +201,7 @@ public class Matrix {
         Vector result = new Vector(rowsCount);
 
         for (int i = 0; i < rowsCount; i++) {
-            result.setAt(i, Vector.getScalarProduct(matrix[i], vector));
+            result.setCoordinate(i, Vector.getScalarProduct(matrix[i], vector));
         }
 
         return result;
@@ -269,7 +269,7 @@ public class Matrix {
 
             for (int j = 0; j < m2.getSize()[1]; j++) {
                 Vector currentColumn = m2.getColumnAt(j);
-                result.getRowAt(i).setAt(j, Vector.getScalarProduct(currentRow, currentColumn));
+                result.getRowAt(i).setCoordinate(j, Vector.getScalarProduct(currentRow, currentColumn));
             }
         }
 
