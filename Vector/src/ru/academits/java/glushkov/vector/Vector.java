@@ -128,7 +128,7 @@ public class Vector {
 
     public double getCoordinate(int index) {
         if (index < 0 || index >= array.length) {
-            throw new IndexOutOfBoundsException("Index must be positive number and must be less than vector's size: index = " + index);
+            throw new IndexOutOfBoundsException("Index must be non-negative and must be less than vector's size: index = " + index);
         }
 
         return array[index];
@@ -136,7 +136,7 @@ public class Vector {
 
     public void setCoordinate(int index, double number) {
         if (index < 0 || index >= array.length) {
-            throw new IndexOutOfBoundsException("Index must be positive number and must be less than vector's size: index = " + index);
+            throw new IndexOutOfBoundsException("Index must be non-negative and must be less than vector's size: index = " + index);
         }
 
         array[index] = number;
