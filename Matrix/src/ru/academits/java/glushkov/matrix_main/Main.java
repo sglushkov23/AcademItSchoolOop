@@ -1,5 +1,6 @@
-package ru.academits.java.glushkov.matrix;
+package ru.academits.java.glushkov.matrix_main;
 
+import ru.academits.java.glushkov.matrix.Matrix;
 import ru.academits.java.glushkov.vector.Vector;
 
 import java.util.Arrays;

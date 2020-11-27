@@ -1,4 +1,4 @@
-package ru.academits.java.glushkov.rangemain;
+package ru.academits.java.glushkov.range_main;
 
 import ru.academits.java.glushkov.range.Range;
 

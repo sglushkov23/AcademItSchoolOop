@@ -1,4 +1,4 @@
-package ru.academits.java.glushkov.vectormain;
+package ru.academits.java.glushkov.vector_main;
 
 import ru.academits.java.glushkov.vector.Vector;
 

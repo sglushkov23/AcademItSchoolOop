@@ -1,4 +1,4 @@
-package ru.academits.java.glushkov.shapemain;
+package ru.academits.java.glushkov.shape_main;
 
 import ru.academits.java.glushkov.shape.Shape;
 

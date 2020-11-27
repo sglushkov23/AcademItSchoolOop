@@ -1,4 +1,4 @@
-package ru.academits.java.glushkov.arraylisthome;
+package ru.academits.java.glushkov.array_list_home;
 
 import java.io.FileInputStream;
 import java.io.IOException;
