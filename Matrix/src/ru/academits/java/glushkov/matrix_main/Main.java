@@ -3,18 +3,16 @@ package ru.academits.java.glushkov.matrix_main;
 import ru.academits.java.glushkov.matrix.Matrix;
 import ru.academits.java.glushkov.vector.Vector;
 
-import java.util.Arrays;
-
 public class Main {
     public static void main(String[] args) {
         System.out.println("1) Тестирование конструкторов");
         System.out.println("a. Конструктор Matrix(n, m):");
 
-        int n = 3;
-        int m = 4;
-        Matrix matrix1 = new Matrix(n, m);
+        int rowsCount = 3;
+        int columnsCount = 4;
+        Matrix matrix1 = new Matrix(rowsCount, columnsCount);
 
-        System.out.printf("Вызов конструктора Matrix(n, m) с параметрами n = %d; m = %d%n", n, m);
+        System.out.printf("Вызов конструктора Matrix(n, m) с параметрами n = %d; m = %d%n", rowsCount, columnsCount);
         System.out.println("matrix1 = " + matrix1);
 
         System.out.println();
@@ -28,7 +26,12 @@ public class Main {
         System.out.println();
         System.out.println("c. Конструктор Matrix(double[][]):");
 
-        double[][] array = new double[][]{{1, 2, 3, 4, 5}, {6, 7}, {8}, {9, 10, 11, 12}};
+        double[][] array = {
+                {1, 2, 3, 4, 5},
+                {6, 7},
+                {8},
+                {9, 10, 11, 12}
+        };
         Matrix matrix3 = new Matrix(array);
 
         System.out.println("matrix3 = " + matrix3);
@@ -51,8 +54,8 @@ public class Main {
         Matrix matrix5 = new Matrix(3, 5);
 
         System.out.println("matrix5 = " + matrix5);
-        System.out.println("matrix5 rows count: " + matrix5.getSize()[0]);
-        System.out.println("matrix5 columns count: " + matrix5.getSize()[1]);
+        System.out.println("matrix5 rows count: " + matrix5.getRowsCount());
+        System.out.println("matrix5 columns count: " + matrix5.getColumnsCount());
 
         System.out.println();
         System.out.println("b. Получение и задание вектора-строки по индексу:");
@@ -77,13 +80,13 @@ public class Main {
         System.out.println("d. Транспонирование матрицы:");
 
         System.out.println("matrix3 = " + matrix3);
-        System.out.println("matrix3 size = " + Arrays.toString(matrix3.getSize()));
+        System.out.println("matrix3 size = " + matrix3.sizeToString());
 
         matrix3.transpose();
 
         System.out.println("После транспонироавания:");
         System.out.println("matrix3 = " + matrix3);
-        System.out.println("matrix3 size = " + Arrays.toString(matrix3.getSize()));
+        System.out.println("matrix3 size = " + matrix3.sizeToString());
 
         System.out.println();
         System.out.println("e. Умножение на скаляр:");
@@ -98,17 +101,32 @@ public class Main {
         System.out.println();
         System.out.println("f. Вычисление определителя матрицы:");
 
-        Matrix matrixDet1 = new Matrix(new double[][]{{1, 2, 3, 4}, {4, -5, 6, 7}, {7, 8, -9, 10}, {-10, 11, 12, 13}});
+        Matrix matrixDet1 = new Matrix(new double[][]{
+                {1, 2, 3, 4},
+                {4, -5, 6, 7},
+                {7, 8, -9, 10},
+                {-10, 11, 12, 13}
+        });
         System.out.println("matrixDet1 = " + matrixDet1);
         System.out.println("Определитель матрицы matrixDet1 = " + matrixDet1.getDeterminant());
         System.out.println();
 
-        Matrix matrixDet2 = new Matrix(new double[][]{{1, -2, 3, 4}, {4, -5, 6, 7}, {7, 8, -9, 10}, {-10, 11, 12, 13}});
+        Matrix matrixDet2 = new Matrix(new double[][]{
+                {1, -2, 3, 4},
+                {4, -5, 6, 7},
+                {7, 8, -9, 10},
+                {-10, 11, 12, 13}
+        });
         System.out.println("matrixDet2 = " + matrixDet2);
         System.out.println("Определитель матрицы matrixDet2 = " + matrixDet2.getDeterminant());
         System.out.println();
 
-        Matrix matrixDet3 = new Matrix(new double[][]{{1, 2, 3, 4}, {4, 5, 6, 7}, {7, 8, 9, 10}, {10, 11, 12, 13}});
+        Matrix matrixDet3 = new Matrix(new double[][]{
+                {1, 2, 3, 4},
+                {4, 5, 6, 7},
+                {7, 8, 9, 10},
+                {10, 11, 12, 13}
+        });
         System.out.println("matrixDet3 = " + matrixDet3);
         System.out.println("Определитель матрицы matrixDet3 = " + matrixDet3.getDeterminant());
         System.out.println();
@@ -120,11 +138,14 @@ public class Main {
 
         System.out.println("h. Умножение матрицы на вектор:");
 
-        Matrix matrix6 = new Matrix(new double[][]{{1, 2, 3, 4}, {5, 6, 7, 8}});
+        Matrix matrix6 = new Matrix(new double[][]{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8}
+        });
         Vector vector1 = new Vector(new double[]{1, 2, 3, 4});
 
         System.out.println("matrix6 = " + matrix6);
-        System.out.println("Размер матрицы matrix6 = " + Arrays.toString(matrix6.getSize()));
+        System.out.println("Размер матрицы matrix6 = " + matrix6.sizeToString());
         System.out.println();
         System.out.println("vector1 = " + vector1);
         System.out.println("Размер вектора vector1 = " + vector1.getSize());
@@ -138,8 +159,16 @@ public class Main {
         System.out.println();
         System.out.println("i. Сложение матриц:");
 
-        Matrix matrix7 = new Matrix(new double[][]{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
-        Matrix matrix8 = new Matrix(new double[][]{{12, 11, 10, 9}, {8, 7, 6, 5}, {4, 3, 2, 1}});
+        Matrix matrix7 = new Matrix(new double[][]{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8},
+                {9, 10, 11, 12}
+        });
+        Matrix matrix8 = new Matrix(new double[][]{
+                {12, 11, 10, 9},
+                {8, 7, 6, 5},
+                {4, 3, 2, 1}
+        });
 
         System.out.println("matrix7 = " + matrix7);
         System.out.println("matrix8 = " + matrix8);
@@ -153,8 +182,16 @@ public class Main {
         System.out.println();
         System.out.println("j. Вычитание матриц:");
 
-        Matrix matrix9 = new Matrix(new double[][]{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
-        Matrix matrix10 = new Matrix(new double[][]{{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}});
+        Matrix matrix9 = new Matrix(new double[][]{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8},
+                {9, 10, 11, 12}
+        });
+        Matrix matrix10 = new Matrix(new double[][]{
+                {0, 1, 2, 3},
+                {4, 5, 6, 7},
+                {8, 9, 10, 11}
+        });
 
         System.out.println("matrix9 = " + matrix9);
         System.out.println("matrix10 = " + matrix10);
@@ -169,8 +206,16 @@ public class Main {
         System.out.println("3) Тестирование статических методов");
         System.out.println("a. Сложение матриц:");
 
-        Matrix matrix11 = new Matrix(new double[][]{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
-        Matrix matrix12 = new Matrix(new double[][]{{12, 11, 10, 9}, {8, 7, 6, 5}, {4, 3, 2, 1}});
+        Matrix matrix11 = new Matrix(new double[][]{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8},
+                {9, 10, 11, 12}
+        });
+        Matrix matrix12 = new Matrix(new double[][]{
+                {12, 11, 10, 9},
+                {8, 7, 6, 5},
+                {4, 3, 2, 1}
+        });
 
         System.out.println("matrix11 = " + matrix11);
         System.out.println("matrix12 = " + matrix12);
@@ -184,8 +229,16 @@ public class Main {
 
         System.out.println();
         System.out.println("b. Вычитание матриц:");
-        Matrix matrix14 = new Matrix(new double[][]{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
-        Matrix matrix15 = new Matrix(new double[][]{{12, 11, 10, 9}, {8, 7, 6, 5}, {4, 3, 2, 1}});
+        Matrix matrix14 = new Matrix(new double[][]{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8},
+                {9, 10, 11, 12}
+        });
+        Matrix matrix15 = new Matrix(new double[][]{
+                {12, 11, 10, 9},
+                {8, 7, 6, 5},
+                {4, 3, 2, 1}
+        });
 
         System.out.println("matrix14 = " + matrix14);
         System.out.println("matrix15 = " + matrix15);
@@ -200,17 +253,25 @@ public class Main {
         System.out.println();
         System.out.println("c. Умножение матриц:");
 
-        Matrix matrix17 = new Matrix(new double[][]{{1, 2, 3, 4}, {5, 6, 7, 8}});
-        Matrix matrix18 = new Matrix(new double[][]{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12}});
+        Matrix matrix17 = new Matrix(new double[][]{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8}
+        });
+        Matrix matrix18 = new Matrix(new double[][]{
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 9},
+                {10, 11, 12}
+        });
 
         System.out.println("matrix17 = " + matrix17);
-        System.out.println("Размер матрицы matrix17: " + Arrays.toString(matrix17.getSize()));
+        System.out.println("Размер матрицы matrix17: " + matrix17.sizeToString());
         System.out.println("matrix18 = " + matrix18);
-        System.out.println("Размер матрицы matrix18: " + Arrays.toString(matrix18.getSize()));
+        System.out.println("Размер матрицы matrix18: " + matrix18.sizeToString());
 
         Matrix matrix19 = Matrix.getProduct(matrix17, matrix18);
 
         System.out.println("Произведение матриц matrix17 и matrix18 (matrix19) = " + matrix19);
-        System.out.println("Размер матрицы matrix19: " + Arrays.toString(matrix19.getSize()));
+        System.out.println("Размер матрицы matrix19: " + matrix19.sizeToString());
     }
 }
