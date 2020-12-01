@@ -7,9 +7,6 @@ public class Triangle implements Shape {
     private double y2;
     private double x3;
     private double y3;
-    private double side1Length;
-    private double side2Length;
-    private double side3Length;
 
     public Triangle(double x1, double y1, double x2, double y2, double x3, double y3) {
         this.x1 = x1;
@@ -18,14 +15,6 @@ public class Triangle implements Shape {
         this.y2 = y2;
         this.x3 = x3;
         this.y3 = y3;
-
-        calculateSidesLengths();
-    }
-
-    private void calculateSidesLengths() {
-        side1Length = getSideLength(x1, y1, x2, y2);
-        side2Length = getSideLength(x1, y1, x3, y3);
-        side3Length = getSideLength(x2, y2, x3, y3);
     }
 
     public double getX1() {
@@ -34,7 +23,6 @@ public class Triangle implements Shape {
 
     public void setX1(double x1) {
         this.x1 = x1;
-        calculateSidesLengths();
     }
 
     public double getY1() {
@@ -43,7 +31,6 @@ public class Triangle implements Shape {
 
     public void setY1(double y1) {
         this.y1 = y1;
-        calculateSidesLengths();
     }
 
     public double getX2() {
@@ -52,7 +39,6 @@ public class Triangle implements Shape {
 
     public void setX2(double x2) {
         this.x2 = x2;
-        calculateSidesLengths();
     }
 
     public double getY2() {
@@ -61,7 +47,6 @@ public class Triangle implements Shape {
 
     public void setY2(double y2) {
         this.y2 = y2;
-        calculateSidesLengths();
     }
 
     public double getX3() {
@@ -70,7 +55,6 @@ public class Triangle implements Shape {
 
     public void setX3(double x3) {
         this.x3 = x3;
-        calculateSidesLengths();
     }
 
     public double getY3() {
@@ -79,7 +63,6 @@ public class Triangle implements Shape {
 
     public void setY3(double y3) {
         this.y3 = y3;
-        calculateSidesLengths();
     }
 
     @Override
@@ -98,7 +81,11 @@ public class Triangle implements Shape {
 
     @Override
     public double getArea() {
-        double semiPerimeter = getPerimeter() / 2;
+        double side1Length = getSideLength(x1, y1, x2, y2);
+        double side2Length = getSideLength(x1, y1, x3, y3);
+        double side3Length = getSideLength(x2, y2, x3, y3);
+
+        double semiPerimeter = (side1Length + side2Length + side3Length) / 2;
 
         return Math.sqrt(semiPerimeter * (semiPerimeter - side1Length) *
                 (semiPerimeter - side2Length) * (semiPerimeter - side3Length));
@@ -106,13 +93,16 @@ public class Triangle implements Shape {
 
     @Override
     public double getPerimeter() {
+        double side1Length = getSideLength(x1, y1, x2, y2);
+        double side2Length = getSideLength(x1, y1, x3, y3);
+        double side3Length = getSideLength(x2, y2, x3, y3);
+
         return side1Length + side2Length + side3Length;
     }
 
     @Override
     public String toString() {
-        return String.format("{Triangle: (x1 = %.2f; y1 = %.2f), (x2 = %.2f; y2 = %.2f), (x3 = %.2f; y3 = %.2f)}",
-                x1, y1, x2, y2, x3, y3);
+        return String.format("{Triangle: (%.2f; %.2f), (%.2f; %.2f), (%.2f; %.2f)}", x1, y1, x2, y2, x3, y3);
     }
 
     @Override
