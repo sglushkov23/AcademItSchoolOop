@@ -67,7 +67,7 @@ public class Main {
         personsList.stream()
                 .filter(p -> p.getAge() >= 20 && p.getAge() <= 45)
                 .sorted((p1, p2) -> Integer.compare(p2.getAge(), p1.getAge()))
-                .forEach(p-> System.out.printf("%s (age: %d)%n", p.getName(), p.getAge()));
+                .forEach(p -> System.out.printf("%s (age: %d)%n", p.getName(), p.getAge()));
 
         System.out.println();
         System.out.println("ЗАДАЧА 2");
