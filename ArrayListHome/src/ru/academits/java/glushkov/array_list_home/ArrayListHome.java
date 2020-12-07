@@ -7,10 +7,8 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class ArrayListHome {
-    public static void readFileLinesToArrayList(String fileName, ArrayList<String> list) {
-        if (list == null) {
-            throw new NullPointerException("List argument must be not null");
-        }
+    public static ArrayList<String> readFileLinesToArrayList(String fileName) {
+        ArrayList<String> list = new ArrayList<>();
 
         try (Scanner scanner = new Scanner(new FileInputStream(fileName))) {
             while (scanner.hasNextLine()) {
@@ -19,6 +17,8 @@ public class ArrayListHome {
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
         }
+
+        return list;
     }
 
     public static void removeEvenNumbersFromList(ArrayList<Integer> list) {
@@ -53,8 +53,7 @@ public class ArrayListHome {
     public static void main(String[] args) {
         System.out.println("1) Чтение в список всех строк из файла");
 
-        ArrayList<String> fileLinesList = new ArrayList<>();
-        readFileLinesToArrayList("input.txt", fileLinesList);
+        ArrayList<String> fileLinesList = readFileLinesToArrayList("input.txt");
         System.out.println("fileLinesList = " + fileLinesList);
 
         System.out.println();
