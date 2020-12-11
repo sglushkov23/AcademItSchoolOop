@@ -65,7 +65,10 @@ public class Main {
         System.out.println();
         System.out.println("4) Метод toArray(T1[] array)");
 
-        Number[] list3NumberArray = list3.toArray(new Number[list3.size() + 3]);
+        Number[] array = new Number[list3.size() + 3];
+        Arrays.fill(array, 1);
+
+        Number[] list3NumberArray = list3.toArray(array);
 
         System.out.println(Arrays.toString(list3NumberArray));
 
@@ -139,6 +142,7 @@ public class Main {
         System.out.println("list7 = " + list7 + "; size = " + list7.size());
 
         list7.removeAll(list9);
+        list7.trimToSize();
 
         System.out.println("После удаления из списка list7 элементов списка list9");
         System.out.println("list7 = " + list7 + "; size = " + list7.size());

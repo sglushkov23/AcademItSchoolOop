@@ -4,15 +4,20 @@ import java.util.*;
 
 public class MyArrayList<T> implements List<T> {
     private T[] items;
-    private int length;
-    private int modCount = 0;
+    private int size;
+    private int modCount;
+    private static final int DEFAULT_CAPACITY = 10;
 
     public MyArrayList() {
         //noinspection unchecked
-        items = (T[]) new Object[10];
+        items = (T[]) new Object[DEFAULT_CAPACITY];
     }
 
     public MyArrayList(int initialCapacity) {
+        if (initialCapacity < 0) {
+            throw new IllegalArgumentException("Argument initialCapacity must be non-negative: initialCapacity = " + initialCapacity);
+        }
+
         //noinspection unchecked
         items = (T[]) new Object[initialCapacity];
     }
@@ -24,11 +29,11 @@ public class MyArrayList<T> implements List<T> {
 
         //noinspection unchecked
         items = (T[]) c.toArray();
-        length += c.size();
+        size = c.size();
     }
 
     private void increaseCapacity() {
-        items = Arrays.copyOf(items, items.length * 2);
+        items = Arrays.copyOf(items, items.length == 0 ? DEFAULT_CAPACITY : items.length * 2);
     }
 
     public void ensureCapacity(int minCapacity) {
@@ -38,30 +43,24 @@ public class MyArrayList<T> implements List<T> {
     }
 
     public void trimToSize() {
-        if (items.length > length) {
-            items = Arrays.copyOf(items, length);
+        if (items.length > size) {
+            items = Arrays.copyOf(items, size);
         }
     }
 
     @Override
     public int size() {
-        return length;
+        return size;
     }
 
     @Override
     public boolean isEmpty() {
-        return length == 0;
+        return size == 0;
     }
 
     @Override
     public boolean contains(Object o) {
-        for (int i = 0; i < length; i++) {
-            if (Objects.equals(o, items[i])) {
-                return true;
-            }
-        }
-
-        return false;
+        return indexOf(o) != -1;
     }
 
     @Override
@@ -71,7 +70,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public Object[] toArray() {
-        return Arrays.copyOf(items, length);
+        return Arrays.copyOf(items, size);
     }
 
     @Override
@@ -80,25 +79,24 @@ public class MyArrayList<T> implements List<T> {
             throw new NullPointerException("The array argument must be not null");
         }
 
-        if (array.length < length) {
+        if (array.length < size) {
             //noinspection unchecked
-            return (T1[]) Arrays.copyOf(items, length, array.getClass());
+            return (T1[]) Arrays.copyOf(items, size, array.getClass());
         }
 
-        System.arraycopy(items, 0, array, 0, length);
+        //noinspection SuspiciousSystemArraycopy
+        System.arraycopy(items, 0, array, 0, size);
+
+        if (array.length > size) {
+            array[size] = null;
+        }
 
         return array;
     }
 
     @Override
-    public boolean add(T t) {
-        if (length >= items.length) {
-            increaseCapacity();
-        }
-
-        items[length] = t;
-        length++;
-        modCount++;
+    public boolean add(T item) {
+        add(size, item);
 
         return true;
     }
@@ -122,8 +120,8 @@ public class MyArrayList<T> implements List<T> {
             throw new NullPointerException("Collection argument c must be not null");
         }
 
-        for (Object elem : c) {
-            if (!contains(elem)) {
+        for (Object item : c) {
+            if (!contains(item)) {
                 return false;
             }
         }
@@ -133,24 +131,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean addAll(Collection<? extends T> c) {
-        if (c == null) {
-            throw new NullPointerException("Collection argument c must be not null");
-        }
-
-        int collectionSize = c.size();
-
-        if (collectionSize == 0) {
-            return false;
-        }
-
-        ensureCapacity(length + collectionSize);
-        //noinspection unchecked
-        T[] collectionArray = c.toArray((T[]) new Object[collectionSize]);
-        System.arraycopy(collectionArray, 0, items, length, collectionSize);
-        length += collectionSize;
-        modCount++;
-
-        return true;
+        return addAll(size, c);
     }
 
     @Override
@@ -159,26 +140,31 @@ public class MyArrayList<T> implements List<T> {
             throw new NullPointerException("Collection argument c must be not null");
         }
 
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException(String.format(
+                    "Index must be non-negative and not bigger than list size (%d): index = %d", size, index));
+        }
+
         int collectionSize = c.size();
 
         if (collectionSize == 0) {
             return false;
         }
 
-        if (index < 0 || index > length) {
-            throw new IndexOutOfBoundsException("Index must be non-negative and not bigger than list size: index = " + index);
+        ensureCapacity(size + collectionSize);
+
+        if (index < size) {
+            System.arraycopy(items, index, items, index + collectionSize, size - index);
         }
 
-        ensureCapacity(length + collectionSize);
-        //noinspection unchecked
-        T[] collectionArray = c.toArray((T[]) new Object[collectionSize]);
+        int i = 0;
 
-        if (index < length) {
-            System.arraycopy(items, index, items, index + collectionSize, length - index);
+        for (T item : c) {
+            items[index + i] = item;
+            i++;
         }
 
-        System.arraycopy(collectionArray, 0, items, index, collectionSize);
-        length += collectionSize;
+        size += collectionSize;
         modCount++;
 
         return true;
@@ -189,7 +175,7 @@ public class MyArrayList<T> implements List<T> {
             throw new NullPointerException("Collection argument c must be not null");
         }
 
-        int startLength = length;
+        int startLength = size;
 
         for (int i = startLength - 1; i >= 0; i--) {
             if (c.contains(items[i]) == isRemoving) {
@@ -197,13 +183,7 @@ public class MyArrayList<T> implements List<T> {
             }
         }
 
-        if (startLength != length) {
-            trimToSize();
-
-            return true;
-        }
-
-        return false;
+        return startLength != size;
     }
 
     @Override
@@ -218,73 +198,80 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public void clear() {
-        //noinspection unchecked
-        items = (T[]) new Object[0];
-        length = 0;
+        for (int i = 0; i < size; i++) {
+            items[i] = null;
+        }
+
+        size = 0;
         modCount++;
     }
 
     @Override
     public T get(int index) {
-        if (index < 0 || index >= length) {
-            throw new IndexOutOfBoundsException("Index must be non-negative and less than list size: index = " + index);
+        if (isNotValid(index)) {
+            throw new IndexOutOfBoundsException(String.format(
+                    "Index must be non-negative and less than list size (%d): index = %d", size, index));
         }
 
         return items[index];
     }
 
     @Override
-    public T set(int index, T element) {
-        if (index < 0 || index >= length) {
-            throw new IndexOutOfBoundsException("Index must be non-negative and less than list size: index = " + index);
+    public T set(int index, T item) {
+        if (isNotValid(index)) {
+            throw new IndexOutOfBoundsException(String.format(
+                    "Index must be non-negative and less than list size (%d): index = %d", size, index));
         }
 
-        T previousElement = items[index];
-        items[index] = element;
+        T oldItem = items[index];
+        items[index] = item;
 
-        return previousElement;
+        return oldItem;
     }
 
     @Override
-    public void add(int index, T element) {
-        if (index < 0 || index > length) {
-            throw new IndexOutOfBoundsException("Index must be non-negative and not bigger than list size: index = " + index);
+    public void add(int index, T item) {
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException(String.format(
+                    "Index must be non-negative and not bigger than list size (%d): index = %d", size, index));
         }
 
-        if (length >= items.length) {
+        if (size >= items.length) {
             increaseCapacity();
         }
 
-        if (index < length) {
-            System.arraycopy(items, index, items, index + 1, length - index);
+        if (index < size) {
+            System.arraycopy(items, index, items, index + 1, size - index);
         }
 
-        items[index] = element;
-        length++;
+        items[index] = item;
+        size++;
         modCount++;
     }
 
     @Override
     public T remove(int index) {
-        if (index < 0 || index >= length) {
-            throw new IndexOutOfBoundsException("Index must be non-negative and less than list size: index = " + index);
+        if (isNotValid(index)) {
+            throw new IndexOutOfBoundsException(String.format(
+                    "Index must be non-negative and less than list size (%d): index = %d", size, index));
         }
 
-        T elementToRemove = items[index];
+        T itemToRemove = items[index];
 
-        if (index < length - 1) {
-            System.arraycopy(items, index + 1, items, index, length - index - 1);
+        if (index < size - 1) {
+            System.arraycopy(items, index + 1, items, index, size - index - 1);
         }
 
-        length--;
+        size--;
+        items[size] = null;
         modCount++;
 
-        return elementToRemove;
+        return itemToRemove;
     }
 
     @Override
     public int indexOf(Object o) {
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < size; i++) {
             if (Objects.equals(o, items[i])) {
                 return i;
             }
@@ -295,7 +282,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public int lastIndexOf(Object o) {
-        for (int i = length - 1; i >= 0; i--) {
+        for (int i = size - 1; i >= 0; i--) {
             if (Objects.equals(o, items[i])) {
                 return i;
             }
@@ -321,19 +308,23 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public String toString() {
-        StringBuilder listString = new StringBuilder("[");
+        StringBuilder stringBuilder = new StringBuilder("[");
 
-        for (int i = 0; i < length; i++) {
-            listString.append(items[i]).append(", ");
+        for (int i = 0; i < size; i++) {
+            stringBuilder.append(items[i]).append(", ");
         }
 
-        if (listString.length() >= 2) {
-            listString.delete(listString.length() - 2, listString.length());
+        if (stringBuilder.length() >= 2) {
+            stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
         }
 
-        listString.append("]");
+        stringBuilder.append("]");
 
-        return listString.toString();
+        return stringBuilder.toString();
+    }
+
+    private boolean isNotValid(int index) {
+        return index < 0 || index >= size;
     }
 
     private class MyArrayListIterator implements Iterator<T> {
@@ -342,7 +333,7 @@ public class MyArrayList<T> implements List<T> {
 
         @Override
         public boolean hasNext() {
-            return currentIndex + 1 < length;
+            return currentIndex + 1 < size;
         }
 
         @Override
@@ -351,11 +342,11 @@ public class MyArrayList<T> implements List<T> {
                 throw new ConcurrentModificationException("List has been changed during iteration");
             }
 
-            currentIndex++;
-
-            if (currentIndex >= length) {
-                throw new NoSuchElementException();
+            if (!hasNext()) {
+                throw new NoSuchElementException(String.format("There is no item with index %d in the list", currentIndex + 1));
             }
+
+            currentIndex++;
 
             return items[currentIndex];
         }
