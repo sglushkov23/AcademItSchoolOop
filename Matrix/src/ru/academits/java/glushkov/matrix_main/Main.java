@@ -80,13 +80,13 @@ public class Main {
         System.out.println("d. Транспонирование матрицы:");
 
         System.out.println("matrix3 = " + matrix3);
-        System.out.println("matrix3 size = " + matrix3.convertSizeToString());
+        System.out.printf("matrix3 size = [%d, %d]%n", matrix3.getRowsCount(), matrix3.getColumnsCount());
 
         matrix3.transpose();
 
         System.out.println("После транспонироавания:");
         System.out.println("matrix3 = " + matrix3);
-        System.out.println("matrix3 size = " + matrix3.convertSizeToString());
+        System.out.printf("matrix3 size = [%d, %d]%n", matrix3.getRowsCount(), matrix3.getColumnsCount());
 
         System.out.println();
         System.out.println("e. Умножение на скаляр:");
@@ -145,7 +145,7 @@ public class Main {
         Vector vector1 = new Vector(new double[]{1, 2, 3, 4});
 
         System.out.println("matrix6 = " + matrix6);
-        System.out.println("Размер матрицы matrix6 = " + matrix6.convertSizeToString());
+        System.out.printf("Размер матрицы matrix6 = [%d, %d]%n", matrix6.getRowsCount(), matrix6.getColumnsCount());
         System.out.println();
         System.out.println("vector1 = " + vector1);
         System.out.println("Размер вектора vector1 = " + vector1.getSize());
@@ -265,13 +265,13 @@ public class Main {
         });
 
         System.out.println("matrix17 = " + matrix17);
-        System.out.println("Размер матрицы matrix17: " + matrix17.convertSizeToString());
+        System.out.printf("Размер матрицы matrix17 = [%d, %d]%n", matrix17.getRowsCount(), matrix17.getColumnsCount());
         System.out.println("matrix18 = " + matrix18);
-        System.out.println("Размер матрицы matrix18: " + matrix18.convertSizeToString());
+        System.out.printf("Размер матрицы matrix18 = [%d, %d]%n", matrix18.getRowsCount(), matrix18.getColumnsCount());
 
         Matrix matrix19 = Matrix.getProduct(matrix17, matrix18);
 
         System.out.println("Произведение матриц matrix17 и matrix18 (matrix19) = " + matrix19);
-        System.out.println("Размер матрицы matrix19: " + matrix19.convertSizeToString());
+        System.out.printf("Размер матрицы matrix19 = [%d, %d]%n", matrix19.getRowsCount(), matrix19.getColumnsCount());
     }
 }

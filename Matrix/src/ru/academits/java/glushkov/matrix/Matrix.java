@@ -106,18 +106,18 @@ public class Matrix {
 
     @Override
     public String toString() {
-        StringBuilder matrixAsString = new StringBuilder("{");
+        StringBuilder stringBuilder = new StringBuilder("{");
 
         for (Vector row : rows) {
-            matrixAsString.append(row).append(", ");
+            stringBuilder.append(row).append(", ");
         }
 
-        matrixAsString.delete(matrixAsString.length() - 2, matrixAsString.length()).append("}");
+        stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length()).append("}");
 
-        return matrixAsString.toString();
+        return stringBuilder.toString();
     }
 
-    public String convertSizeToString() {
+    private String getSizesString() {
         return String.format("[%d, %d]", getRowsCount(), getColumnsCount());
     }
 
@@ -184,7 +184,7 @@ public class Matrix {
     public double getDeterminant() {
         if (getRowsCount() != getColumnsCount()) {
             throw new UnsupportedOperationException("Determinant calculation is possible only for square matrices: " +
-                    "current matrix size = " + convertSizeToString());
+                    "current matrix size = " + getSizesString());
         }
 
         int sign = 1;
@@ -251,7 +251,7 @@ public class Matrix {
 
         if (vector.getSize() != columnsCount) {
             throw new IllegalArgumentException(String.format("Argument vector's size must be equal to number of columns in matrix: " +
-                    "matrix size = %s; vector size = %d", convertSizeToString(), vector.getSize()));
+                    "matrix size = %s; vector size = %d", getSizesString(), vector.getSize()));
         }
 
         Vector result = new Vector(getRowsCount());
@@ -268,7 +268,7 @@ public class Matrix {
     public void add(Matrix matrix) {
         if (haveDifferentSizes(this, matrix)) {
             throw new IllegalArgumentException(String.format("Size of matrix to be added must coincide with the current matrix size: " +
-                    "current matrix size = %s; added matrix size = %s", convertSizeToString(), matrix.convertSizeToString()));
+                    "current matrix size = %s; added matrix size = %s", getSizesString(), matrix.getSizesString()));
         }
 
         int rowsCount = getRowsCount();
@@ -281,7 +281,7 @@ public class Matrix {
     public void subtract(Matrix matrix) {
         if (haveDifferentSizes(this, matrix)) {
             throw new IllegalArgumentException(String.format("Size of matrix to be subtracted must coincide with the current matrix size: " +
-                    "current matrix size = %s; subtracted matrix size = %s", convertSizeToString(), matrix.convertSizeToString()));
+                    "current matrix size = %s; subtracted matrix size = %s", getSizesString(), matrix.getSizesString()));
         }
 
         int rowsCount = getRowsCount();
@@ -294,7 +294,7 @@ public class Matrix {
     public static Matrix getSum(Matrix matrix1, Matrix matrix2) {
         if (haveDifferentSizes(matrix1, matrix2)) {
             throw new IllegalArgumentException(String.format("Sizes of matrices to be summed must coincide:" +
-                    "matrix1 size = %s, matrix2 size = %s", matrix1.convertSizeToString(), matrix2.convertSizeToString()));
+                    "matrix1 size = %s, matrix2 size = %s", matrix1.getSizesString(), matrix2.getSizesString()));
         }
 
         Matrix result = new Matrix(matrix1);
@@ -306,7 +306,7 @@ public class Matrix {
     public static Matrix getDifference(Matrix matrix1, Matrix matrix2) {
         if (haveDifferentSizes(matrix1, matrix2)) {
             throw new IllegalArgumentException(String.format("Sizes of matrices for which difference to be calculated must coincide: " +
-                    "matrix1 size = %s, matrix2 size = %s", matrix1.convertSizeToString(), matrix2.convertSizeToString()));
+                    "matrix1 size = %s, matrix2 size = %s", matrix1.getSizesString(), matrix2.getSizesString()));
         }
 
         Matrix result = new Matrix(matrix1);
@@ -319,7 +319,7 @@ public class Matrix {
         if (matrix1.getColumnsCount() != matrix2.getRowsCount()) {
             throw new IllegalArgumentException(String.format("The number of columns in the first matrix must coincide " +
                             "with the number of rows in the second matrix: matrix1 size = %s, matrix2 size = %s",
-                    matrix1.convertSizeToString(), matrix2.convertSizeToString()));
+                    matrix1.getSizesString(), matrix2.getSizesString()));
         }
 
         int rowsCount = matrix1.getRowsCount();
