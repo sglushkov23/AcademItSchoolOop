@@ -34,10 +34,7 @@ public class Main {
         System.out.println();
         System.out.println("Б) вывести список уникальных имен");
 
-        String uniqueNamesString = personsList.stream()
-                .map(Person::getName)
-                .distinct()
-                .collect(Collectors.joining(", ", "Имена: ", ""));
+        String uniqueNamesString = uniqueNames.stream().collect(Collectors.joining(", ", "Имена: ", "."));
         System.out.println(uniqueNamesString);
 
         System.out.println();
@@ -81,8 +78,8 @@ public class Main {
         int numbersCount = scanner.nextInt();
 
         Stream.iterate(0, x -> x + 1)
-                .limit(numbersCount)
                 .mapToDouble(Math::sqrt)
+                .limit(numbersCount)
                 .forEach(x -> System.out.printf("%.2f ", x));
 
         System.out.println();
@@ -92,8 +89,8 @@ public class Main {
         numbersCount = scanner.nextInt();
 
         Stream.iterate(new int[]{0, 1}, x -> new int[]{x[1], x[0] + x[1]})
-                .limit(numbersCount)
                 .map(x -> x[0])
+                .limit(numbersCount)
                 .forEach(x -> System.out.printf("%d ", x));
     }
 }
