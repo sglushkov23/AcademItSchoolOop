@@ -15,6 +15,8 @@ public class HashTable<T> implements Collection<T> {
     }
 
     public HashTable(int arraySize) {
+        checkArraySizeArgument(arraySize);
+
         //noinspection unchecked
         array = (MyArrayList<T>[]) new MyArrayList<?>[arraySize];
     }
@@ -27,6 +29,8 @@ public class HashTable<T> implements Collection<T> {
         if (c == null) {
             throw new NullPointerException("Collection argument c must be not null");
         }
+
+        checkArraySizeArgument(arraySize);
 
         //noinspection unchecked
         array = (MyArrayList<T>[]) new MyArrayList<?>[arraySize];
@@ -82,7 +86,7 @@ public class HashTable<T> implements Collection<T> {
 
         if (a.length < size) {
             //noinspection unchecked
-            return (T1[]) toArray();
+            return (T1[]) Arrays.copyOf(toArray(), size, a.getClass());
         }
 
         int i = 0;
@@ -168,8 +172,6 @@ public class HashTable<T> implements Collection<T> {
             add(item);
         }
 
-        modCount++;
-
         return true;
     }
 
@@ -180,12 +182,16 @@ public class HashTable<T> implements Collection<T> {
 
         int startSize = size;
 
-        //noinspection unchecked
-        T[] hashTableAsArray = (T[]) toArray();
+        for (MyArrayList<T> e : array) {
+            if (e != null) {
+                for (int j = 0; j < e.size(); j++) {
+                    T item = e.get(j);
 
-        for (T item : hashTableAsArray) {
-            if (c.contains(item) == isRemoving) {
-                remove(item);
+                    if (c.contains(item) == isRemoving) {
+                        remove(item);
+                        j--;
+                    }
+                }
             }
         }
 
@@ -221,10 +227,12 @@ public class HashTable<T> implements Collection<T> {
     }
 
     private int getIndex(Object o) {
-        return Math.abs(o.hashCode() % array.length);
+        return Math.abs(o == null ? 0 : o.hashCode() % array.length);
     }
 
     public void rebuild(int arraySize) {
+        checkArraySizeArgument(arraySize);
+
         //noinspection unchecked
         T[] hashTableArray = (T[]) toArray();
 
@@ -232,6 +240,12 @@ public class HashTable<T> implements Collection<T> {
         array = (MyArrayList<T>[]) new MyArrayList<?>[arraySize];
 
         addAll(Arrays.asList(hashTableArray));
+    }
+
+    private void checkArraySizeArgument(int arraySize) {
+        if (arraySize <= 0) {
+            throw new IllegalArgumentException("Argument arraySize must be positive integer: arraySize = " + arraySize);
+        }
     }
 
     private class HashTableIterator implements Iterator<T> {

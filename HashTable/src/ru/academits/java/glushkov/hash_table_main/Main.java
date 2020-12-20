@@ -19,7 +19,7 @@ public class Main {
         System.out.println();
         System.out.println("b) Конструктор, принимающий коллекцию в качестве аргумента");
 
-        HashTable<Integer> hashTable2 = new HashTable<>(Arrays.asList(31, 12, 13, 47, 26, 5, 29));
+        HashTable<Integer> hashTable2 = new HashTable<>(Arrays.asList(31, 12, 13, 47, 26, 5, 29, null));
 
         System.out.printf("hashTable2 = %s; size = %d%n", hashTable2, hashTable2.size());
 
@@ -29,6 +29,7 @@ public class Main {
         System.out.printf("hashTable2 содержит %d: %s%n", 13, hashTable2.contains(13));
         System.out.printf("hashTable2 содержит %d: %s%n", 17, hashTable2.contains(17));
         System.out.printf("hashTable2 содержит %d: %s%n", 26, hashTable2.contains(26));
+        System.out.printf("hashTable2 содержит %s: %s%n", null, hashTable2.contains(null));
 
         System.out.println();
         System.out.println("3) Методы iterator и add");
@@ -38,6 +39,8 @@ public class Main {
         for (int i = 0; i < 15; i++) {
             hashTable3.add(i * 3);
         }
+
+        hashTable3.add(null);
 
         System.out.printf("hashTable3 = %s; size = %d%n", hashTable3, hashTable3.size());
 
@@ -68,8 +71,8 @@ public class Main {
         System.out.println();
         System.out.println("5) Метод toArray(T1[] array)");
 
-        Number[] array = new Number[hashTable3.size() + 3];
-        Arrays.fill(array, 1);
+        Number[] array = new Number[hashTable3.size() - 3];
+        Arrays.fill(array, 1.);
 
         Number[] hashTable3NumberArray = hashTable3.toArray(array);
 
