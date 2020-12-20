@@ -30,15 +30,15 @@ public class SinglyLinkedList<T> {
             if (isFirstItem) {
                 head = nextItem;
                 item = nextItem;
-                size++;
                 isFirstItem = false;
                 continue;
             }
 
             item.setNext(nextItem);
-            size++;
             item = item.getNext();
         }
+
+        size = c.size();
     }
 
     public int getSize() {
