@@ -1,6 +1,7 @@
 package ru.academits.java.glushkov.list;
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class SinglyLinkedList<T> {
@@ -24,7 +25,7 @@ public class SinglyLinkedList<T> {
         boolean isFirstItem = true;
 
         for (T e : c) {
-            nextItem = new ListItem<>(e, null);
+            nextItem = new ListItem<>(e);
 
             if (isFirstItem) {
                 head = nextItem;
@@ -45,14 +46,7 @@ public class SinglyLinkedList<T> {
     }
 
     private ListItem<T> getItem(int index) {
-        if (head == null) {
-            throw new NullPointerException("List is empty");
-        }
-
-        if (isNotValid(index)) {
-            throw new IndexOutOfBoundsException(String.format(
-                    "Index must be non-negative and must be less than list size (%d): index = %d", size, index));
-        }
+        checkIndex(index, false);
 
         ListItem<T> item = head;
 
@@ -63,19 +57,19 @@ public class SinglyLinkedList<T> {
         return item;
     }
 
-    public T getFirstItemData() {
+    public T getFirst() {
         if (head == null) {
-            throw new NullPointerException("List is empty");
+            throw new NoSuchElementException("List is empty");
         }
 
         return head.getData();
     }
 
-    public T getItemDataAt(int index) {
+    public T get(int index) {
         return getItem(index).getData();
     }
 
-    public T setItemDataAt(int index, T data) {
+    public T set(int index, T data) {
         ListItem<T> item = getItem(index);
         T oldData = item.getData();
         item.setData(data);
@@ -84,13 +78,10 @@ public class SinglyLinkedList<T> {
     }
 
     public T remove(int index) {
-        if (isNotValid(index)) {
-            throw new IndexOutOfBoundsException(String.format(
-                    "Index must be non-negative and must be less than list size (%d): index = %d", size, index));
-        }
+        checkIndex(index, false);
 
         if (index == 0) {
-            return removeFirstItem();
+            return removeFirst();
         }
 
         ListItem<T> previousItem = getItem(index - 1);
@@ -104,19 +95,16 @@ public class SinglyLinkedList<T> {
         return removedData;
     }
 
-    public void insertAtBeginning(T data) {
+    public void insertFirst(T data) {
         head = new ListItem<>(data, head);
         size++;
     }
 
-    public void insertAt(int index, T data) {
-        if (index < 0 || index > size) {
-            throw new IndexOutOfBoundsException(String.format(
-                    "Index must be non-negative and must be not bigger than list size (%d): index = %d", size, index));
-        }
+    public void insert(int index, T data) {
+        checkIndex(index, true);
 
         if (index == 0) {
-            insertAtBeginning(data);
+            insertFirst(data);
 
             return;
         }
@@ -127,13 +115,13 @@ public class SinglyLinkedList<T> {
         size++;
     }
 
-    public boolean removeItemByData(T data) {
-        for (ListItem<T> p = head, prev = null; p != null; prev = p, p = p.getNext()) {
-            if (Objects.equals(data, p.getData())) {
-                if (prev == null) {
-                    head = p.getNext();
+    public boolean removeByData(T data) {
+        for (ListItem<T> currentItem = head, previousItem = null; currentItem != null; previousItem = currentItem, currentItem = currentItem.getNext()) {
+            if (Objects.equals(data, currentItem.getData())) {
+                if (previousItem == null) {
+                    head = currentItem.getNext();
                 } else {
-                    prev.setNext(p.getNext());
+                    previousItem.setNext(currentItem.getNext());
                 }
 
                 size--;
@@ -145,9 +133,9 @@ public class SinglyLinkedList<T> {
         return false;
     }
 
-    public T removeFirstItem() {
+    public T removeFirst() {
         if (head == null) {
-            throw new NullPointerException("List is empty");
+            throw new NoSuchElementException("List is empty");
         }
 
         T data = head.getData();
@@ -158,28 +146,24 @@ public class SinglyLinkedList<T> {
     }
 
     public void reverse() {
-        if (size == 0) {
-            throw new UnsupportedOperationException("Reversion is supported only for non-zero length lists");
-        }
-
-        if (size == 1) {
+        if (size == 0 || size == 1) {
             return;
         }
 
-        ListItem<T> prePrev = null;
-        ListItem<T> prev = head;
-        ListItem<T> p = head.getNext();
+        ListItem<T> previousItem = null;
+        ListItem<T> currentItem = head;
+        ListItem<T> nextItem = head.getNext();
 
         do {
-            prev.setNext(prePrev);
+            currentItem.setNext(previousItem);
 
-            prePrev = prev;
-            prev = p;
-            p = p.getNext();
-        } while (p != null);
+            previousItem = currentItem;
+            currentItem = nextItem;
+            nextItem = nextItem.getNext();
+        } while (nextItem != null);
 
-        prev.setNext(prePrev);
-        head = prev;
+        currentItem.setNext(previousItem);
+        head = currentItem;
     }
 
     public SinglyLinkedList<T> copy() {
@@ -188,19 +172,19 @@ public class SinglyLinkedList<T> {
         }
 
         SinglyLinkedList<T> copy = new SinglyLinkedList<>();
-        copy.head = new ListItem<>(head.getData(), null);
-        copy.size++;
+        copy.head = new ListItem<>(head.getData());
 
         ListItem<T> item = copy.head;
         ListItem<T> nextItem;
 
         for (ListItem<T> p = head.getNext(); p != null; p = p.getNext()) {
-            nextItem = new ListItem<>(p.getData(), null);
+            nextItem = new ListItem<>(p.getData());
 
             item.setNext(nextItem);
-            copy.size++;
             item = item.getNext();
         }
+
+        copy.size = size;
 
         return copy;
     }
@@ -222,7 +206,17 @@ public class SinglyLinkedList<T> {
         return stringBuilder.toString();
     }
 
-    private boolean isNotValid(int index) {
-        return index < 0 || index >= size;
+    private void checkIndex(int index, boolean isAllowedEquality) {
+        if (isAllowedEquality) {
+            if (index < 0 || index > size) {
+                throw new IndexOutOfBoundsException(String.format(
+                        "Index must be non-negative and not bigger than list size: index = %d; list size = %d", index, size));
+            }
+        } else {
+            if (index < 0 || index >= size) {
+                throw new IndexOutOfBoundsException(String.format(
+                        "Index must be non-negative and less than list size: index = %d, list size = %d", index, size));
+            }
+        }
     }
 }

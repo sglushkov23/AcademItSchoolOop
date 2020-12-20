@@ -1,6 +1,6 @@
 package ru.academits.java.glushkov.list;
 
-public class ListItem<T> {
+class ListItem<T> {
     private T data;
     private ListItem<T> next;
 
