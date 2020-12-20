@@ -39,7 +39,7 @@ public class Main {
         System.out.printf("list3 содержит %d: %s%n", 4, list3.contains(4));
 
         System.out.println();
-        System.out.println("2) Метод iterator");
+        System.out.println("3) Метод iterator");
         System.out.println("Вывод элементов списка list3 с помощью итератора:");
 
         Iterator list3Iterator = list3.iterator();
@@ -56,14 +56,14 @@ public class Main {
         }
 
         System.out.println();
-        System.out.println("3) Метод toArray()");
+        System.out.println("4) Метод toArray()");
 
         Object[] list3ObjectArray = list3.toArray();
 
         System.out.println(Arrays.toString(list3ObjectArray));
 
         System.out.println();
-        System.out.println("4) Метод toArray(T1[] array)");
+        System.out.println("5) Метод toArray(T1[] array)");
 
         Number[] array = new Number[list3.size() + 3];
         Arrays.fill(array, 1);
@@ -73,7 +73,7 @@ public class Main {
         System.out.println(Arrays.toString(list3NumberArray));
 
         System.out.println();
-        System.out.println("5) Метод add()");
+        System.out.println("6) Метод add()");
 
         System.out.println("list4 = " + list4 + "; size = " + list4.size());
 
@@ -84,7 +84,7 @@ public class Main {
         System.out.println("list4 = " + list4 + "; size = " + list4.size());
 
         System.out.println();
-        System.out.println("6) Метод remove(Object o)");
+        System.out.println("7) Метод remove(Object o)");
 
         System.out.println("list4 = " + list4 + "; size = " + list4.size());
 
@@ -95,7 +95,7 @@ public class Main {
         System.out.println("list4 = " + list4 + "; size = " + list4.size());
 
         System.out.println();
-        System.out.println("7) Метод containsAll");
+        System.out.println("8) Метод containsAll");
 
         System.out.println("list3 = " + list3 + "; size = " + list3.size());
 
@@ -109,7 +109,7 @@ public class Main {
         System.out.println("list3 содержит все элементы списка list6: " + list3.containsAll(list6));
 
         System.out.println();
-        System.out.println("8) Метод addAll(int index, Collection<? extends T> c)");
+        System.out.println("9) Метод addAll(int index, Collection<? extends T> c)");
 
         MyArrayList<Number> list7 = new MyArrayList<>(Arrays.asList(1, 2, 3, 4, 5));
         MyArrayList<Integer> list8 = new MyArrayList<>(Arrays.asList(-1, -2, -3));
@@ -130,7 +130,7 @@ public class Main {
         System.out.println("list7 = " + list7 + "; size = " + list7.size());
 
         System.out.println();
-        System.out.println("9) Метод removeAll(Collection<?> c)");
+        System.out.println("10) Метод removeAll(Collection<?> c)");
 
         System.out.println("list7 = " + list7 + "; size = " + list7.size());
         System.out.println("list8 = " + list8 + "; size = " + list8.size());
@@ -148,7 +148,7 @@ public class Main {
         System.out.println("list7 = " + list7 + "; size = " + list7.size());
 
         System.out.println();
-        System.out.println("10) Метод retainAll(Collection<?> c)");
+        System.out.println("11) Метод retainAll(Collection<?> c)");
 
         MyArrayList<Integer> list10 = new MyArrayList<>(Arrays.asList(1, 2, 1, 3, 4, 2, 1));
         MyArrayList<Integer> list11 = new MyArrayList<>(Arrays.asList(2, 4));
@@ -162,7 +162,7 @@ public class Main {
         System.out.println("list10 = " + list10 + "; size = " + list10.size());
 
         System.out.println();
-        System.out.println("11) Методы get, set, add, remove");
+        System.out.println("12) Методы get, set, add, remove");
 
         MyArrayList<Integer> list12 = new MyArrayList<>(Arrays.asList(1, 3, 5, 6));
 
@@ -188,7 +188,7 @@ public class Main {
         System.out.println("list12 = " + list12 + "; size = " + list12.size());
 
         System.out.println();
-        System.out.println("12) Методы indexOf, lastIndexOf");
+        System.out.println("13) Методы indexOf, lastIndexOf");
 
         MyArrayList<Integer> list13 = new MyArrayList<>(Arrays.asList(6, 4, 8, 2, 9, 4, 2, 9, 3));
 

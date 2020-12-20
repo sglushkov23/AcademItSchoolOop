@@ -140,10 +140,7 @@ public class MyArrayList<T> implements List<T> {
             throw new NullPointerException("Collection argument c must be not null");
         }
 
-        if (index < 0 || index > size) {
-            throw new IndexOutOfBoundsException(String.format(
-                    "Index must be non-negative and not bigger than list size (%d): index = %d", size, index));
-        }
+        checkIndex(index, true);
 
         int collectionSize = c.size();
 
@@ -157,10 +154,10 @@ public class MyArrayList<T> implements List<T> {
             System.arraycopy(items, index, items, index + collectionSize, size - index);
         }
 
-        int i = 0;
+        int i = index;
 
         for (T item : c) {
-            items[index + i] = item;
+            items[i] = item;
             i++;
         }
 
@@ -175,15 +172,15 @@ public class MyArrayList<T> implements List<T> {
             throw new NullPointerException("Collection argument c must be not null");
         }
 
-        int startLength = size;
+        int startSize = size;
 
-        for (int i = startLength - 1; i >= 0; i--) {
+        for (int i = startSize - 1; i >= 0; i--) {
             if (c.contains(items[i]) == isRemoving) {
                 remove(i);
             }
         }
 
-        return startLength != size;
+        return startSize != size;
     }
 
     @Override
@@ -208,20 +205,14 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public T get(int index) {
-        if (isNotValid(index)) {
-            throw new IndexOutOfBoundsException(String.format(
-                    "Index must be non-negative and less than list size (%d): index = %d", size, index));
-        }
+        checkIndex(index, false);
 
         return items[index];
     }
 
     @Override
     public T set(int index, T item) {
-        if (isNotValid(index)) {
-            throw new IndexOutOfBoundsException(String.format(
-                    "Index must be non-negative and less than list size (%d): index = %d", size, index));
-        }
+        checkIndex(index, false);
 
         T oldItem = items[index];
         items[index] = item;
@@ -231,10 +222,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public void add(int index, T item) {
-        if (index < 0 || index > size) {
-            throw new IndexOutOfBoundsException(String.format(
-                    "Index must be non-negative and not bigger than list size (%d): index = %d", size, index));
-        }
+        checkIndex(index, true);
 
         if (size >= items.length) {
             increaseCapacity();
@@ -251,10 +239,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public T remove(int index) {
-        if (isNotValid(index)) {
-            throw new IndexOutOfBoundsException(String.format(
-                    "Index must be non-negative and less than list size (%d): index = %d", size, index));
-        }
+        checkIndex(index, false);
 
         T itemToRemove = items[index];
 
@@ -308,23 +293,33 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public String toString() {
+        if (isEmpty()) {
+            return "[]";
+        }
+
         StringBuilder stringBuilder = new StringBuilder("[");
 
         for (int i = 0; i < size; i++) {
             stringBuilder.append(items[i]).append(", ");
         }
 
-        if (stringBuilder.length() >= 2) {
-            stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
-        }
-
-        stringBuilder.append("]");
+        stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length()).append("]");
 
         return stringBuilder.toString();
     }
 
-    private boolean isNotValid(int index) {
-        return index < 0 || index >= size;
+    private void checkIndex(int index, boolean isAllowedEquality) {
+        if (isAllowedEquality) {
+            if (index < 0 || index > size) {
+                throw new IndexOutOfBoundsException(String.format(
+                        "Index must be non-negative and not bigger than list size: index = %d; list size = %d", index, size));
+            }
+        } else {
+            if (index < 0 || index >= size) {
+                throw new IndexOutOfBoundsException(String.format(
+                        "Index must be non-negative and less than list size: index = %d, list size = %d", index, size));
+            }
+        }
     }
 
     private class MyArrayListIterator implements Iterator<T> {
