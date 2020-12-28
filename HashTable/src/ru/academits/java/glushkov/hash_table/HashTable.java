@@ -52,11 +52,7 @@ public class HashTable<T> implements Collection<T> {
     public boolean contains(Object o) {
         int index = getIndex(o);
 
-        if (array[index] == null) {
-            return false;
-        }
-
-        return array[index].contains(o);
+        return array[index] != null && array[index].contains(o);
     }
 
     @Override
@@ -162,9 +158,7 @@ public class HashTable<T> implements Collection<T> {
             throw new NullPointerException("Collection argument c must be not null");
         }
 
-        int collectionSize = c.size();
-
-        if (collectionSize == 0) {
+        if (c.size() == 0) {
             return false;
         }
 
@@ -182,26 +176,36 @@ public class HashTable<T> implements Collection<T> {
 
         int startSize = size;
 
-        for (MyArrayList<T> e : array) {
-            if (e != null) {
-                for (int j = 0; j < e.size(); j++) {
-                    T item = e.get(j);
+        for (int i = 0; i < array.length; i++) {
+            MyArrayList<T> currentList = array[i];
 
-                    if (c.contains(item) == isRemoving) {
-                        remove(item);
-                        j--;
-                    }
+            if (currentList != null) {
+                int startListSize = currentList.size();
+
+                if (isRemoving) {
+                    //noinspection SuspiciousMethodCalls
+                    currentList.removeAll(c);
+                } else {
+                    //noinspection SuspiciousMethodCalls
+                    currentList.retainAll(c);
+                }
+
+                int endListSize = currentList.size();
+                size -= startListSize - endListSize;
+
+                if (endListSize == 0) {
+                    array[i] = null;
                 }
             }
         }
 
-        boolean anyChanged = startSize != size;
+        boolean isChanged = startSize != size;
 
-        if (anyChanged) {
+        if (isChanged) {
             modCount++;
         }
 
-        return anyChanged;
+        return isChanged;
     }
 
     @Override
@@ -266,7 +270,7 @@ public class HashTable<T> implements Collection<T> {
             }
 
             if (!hasNext()) {
-                throw new NoSuchElementException("There is no more items in HashTable: HashTable size = " + size);
+                throw new NoSuchElementException("There are no more items in HashTable: HashTable size = " + size);
             }
 
             if (listIterator == null || !listIterator.hasNext()) {
