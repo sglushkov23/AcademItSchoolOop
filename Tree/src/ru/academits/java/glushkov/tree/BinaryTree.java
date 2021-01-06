@@ -43,16 +43,9 @@ public class BinaryTree<T> {
         }
 
         TreeNode<T> currentNode = root;
-        int comparingResult;
-        //noinspection unchecked
-        Comparable<T> d = (Comparable<T>) data;
 
         while (true) {
-            if ((comparator == null)) {
-                comparingResult = d.compareTo(currentNode.getData());
-            } else {
-                comparingResult = comparator.compare(data, currentNode.getData());
-            }
+            int comparingResult = compare(data, currentNode.getData());
 
             if (comparingResult < 0) {
                 if (currentNode.getLeftChild() != null) {
@@ -134,6 +127,10 @@ public class BinaryTree<T> {
     }
 
     public void walkInBreadth(Consumer<? super T> action) {
+        if (size == 0) {
+            return;
+        }
+
         Queue<TreeNode<T>> queue = new LinkedList<>();
         queue.add(root);
 
@@ -152,6 +149,10 @@ public class BinaryTree<T> {
     }
 
     public void walkInDepth(Consumer<? super T> action) {
+        if (size == 0) {
+            return;
+        }
+
         ArrayList<TreeNode<T>> stack = new ArrayList<>();
         stack.add(root);
 
@@ -170,6 +171,10 @@ public class BinaryTree<T> {
     }
 
     public void walkInDepthRecursive(Consumer<? super T> action) {
+        if (size == 0) {
+            return;
+        }
+
         visit(root, action);
     }
 
@@ -192,16 +197,9 @@ public class BinaryTree<T> {
 
         TreeNode<T> parentNode = null;
         TreeNode<T> currentNode = root;
-        int comparingResult;
-        //noinspection unchecked
-        Comparable<T> d = (Comparable<T>) data;
 
         while (true) {
-            if ((comparator == null)) {
-                comparingResult = d.compareTo(currentNode.getData());
-            } else {
-                comparingResult = comparator.compare(data, currentNode.getData());
-            }
+            int comparingResult = compare(data, currentNode.getData());
 
             if (comparingResult == 0) {
                 //noinspection unchecked
@@ -241,6 +239,36 @@ public class BinaryTree<T> {
 
     private boolean isLeftChild(TreeNode<T> node, TreeNode<T> parent) {
         return parent.getLeftChild() == node;
+    }
+
+    private int compare(T data1, T data2) {
+        if (comparator == null) {
+            if (data1 == null && data2 != null) {
+                return 1;
+            }
+
+            if (data1 != null && data2 == null) {
+                return -1;
+            }
+
+            if (data1 == null) {
+                return 0;
+            }
+
+            Comparable<T> d;
+
+            if (data1 instanceof Comparable) {
+                //noinspection unchecked
+                d = (Comparable<T>) data1;
+            } else {
+                throw new IllegalArgumentException("If using instance of BinaryTree class without comparator class of " +
+                        "data argument in methods add(T data), contains(T data) and remove(T data) must implement interface Comparable");
+            }
+
+            return d.compareTo(data2);
+        } else {
+            return comparator.compare(data1, data2);
+        }
     }
 
     @Override

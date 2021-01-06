@@ -2,7 +2,9 @@ package ru.academits.java.glushkov.tree_main;
 
 import ru.academits.java.glushkov.tree.BinaryTree;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class Main {
