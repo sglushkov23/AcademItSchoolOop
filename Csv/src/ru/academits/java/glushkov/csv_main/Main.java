@@ -6,14 +6,20 @@ public class Main {
     public static void main(String[] args) {
         if (args.length == 1 && args[0].equals("-help")) {
             displayHelp();
-        } else if (args.length != 2) {
+
+            return;
+        }
+
+        if (args.length != 2) {
             System.out.println("Number of arguments passed (" + (args.length) + ") is incorrect");
             System.out.println();
             displayHelp();
-        } else {
-            Csv csv = new Csv(args[0], args[1]);
-            csv.convertCsvToHtml();
+
+            return;
         }
+
+        Csv csv = new Csv(args[0], args[1]);
+        csv.convertCsvToHtml();
     }
 
     public static void displayHelp() {
