@@ -3,67 +3,43 @@ package ru.academits.java.glushkov.csv;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.Scanner;
 
 public class Csv {
-    private String inputCsvFileName;
-    private String outputHtmlFileName;
-    private final HashMap<Character, String> map;
-
-
-    public Csv() {
-        map = new HashMap<>();
-        map.put('<', "&lt;");
-        map.put('>', "&gt;");
-        map.put('&', "&amp;");
-    }
+    private final String inputCsvFileName;
+    private final String outputHtmlFileName;
 
     public Csv(String inputCsvFileName, String outputHtmlFileName) {
-        this();
         this.inputCsvFileName = inputCsvFileName;
-        this.outputHtmlFileName = outputHtmlFileName;
-    }
-
-    public String getInputCsvFileName() {
-        return inputCsvFileName;
-    }
-
-    public void setInputCsvFileName(String inputCsvFileName) {
-        this.inputCsvFileName = inputCsvFileName;
-    }
-
-    public String getOutputHtmlFileName() {
-        return outputHtmlFileName;
-    }
-
-    public void setOutputHtmlFileName(String outputHtmlFileName) {
         this.outputHtmlFileName = outputHtmlFileName;
     }
 
     public void convertCsvToHtml() {
         try (Scanner scanner = new Scanner(new FileInputStream(inputCsvFileName));
              PrintWriter writer = new PrintWriter(outputHtmlFileName)) {
-
             setHtmlDocumentStartingTags(writer);
 
-            StringBuilder token = new StringBuilder();
             boolean isInQuotesToken = false;
+            boolean needToCloseCurrentTrTagAndOpenNewTrTag = false;
 
             while (scanner.hasNextLine()) {
-                token.append(scanner.nextLine());
-                String currentCsvLine = token.toString();
+                String currentCsvLine = scanner.nextLine();
 
-                int j = 0;
+                if (needToCloseCurrentTrTagAndOpenNewTrTag && !currentCsvLine.equals("")) {
+                    closeCurrentTrTagAndOpenNewTrTag(writer);
+                    needToCloseCurrentTrTagAndOpenNewTrTag = false;
+                }
 
-                while (j < currentCsvLine.length()) {
-                    char currentSymbol = currentCsvLine.charAt(j);
+                int i = 0;
+
+                while (i < currentCsvLine.length()) {
+                    char currentSymbol = currentCsvLine.charAt(i);
 
                     if (isInQuotesToken) {
                         if (currentSymbol != '"') {
                             writeCurrentSymbol(currentSymbol, writer);
                         } else {
-                            int nextSymbolIndex = j + 1;
+                            int nextSymbolIndex = i + 1;
 
                             if (nextSymbolIndex >= currentCsvLine.length() && !scanner.hasNextLine()) {
                                 setHtmlDocumentEndingTags(writer);
@@ -72,19 +48,19 @@ public class Csv {
                             }
 
                             if (nextSymbolIndex >= currentCsvLine.length() && scanner.hasNextLine()) {
-                                closeCurrentTrTagAndOpenNewTrTag(writer);
+                                needToCloseCurrentTrTagAndOpenNewTrTag = true;
                                 isInQuotesToken = false;
                             } else if (currentCsvLine.charAt(nextSymbolIndex) == ',') {
                                 closeCurrentTdTagAndOpenNewTdTag(writer);
                                 isInQuotesToken = false;
-                                j++;
+                                i++;
 
-                                if (j + 1 == currentCsvLine.length()) {
+                                if (i + 1 == currentCsvLine.length()) {
                                     closeCurrentTrTagAndOpenNewTrTag(writer);
                                 }
                             } else {
                                 writer.print(currentSymbol);
-                                j++;
+                                i++;
                             }
                         }
                     } else {
@@ -95,23 +71,21 @@ public class Csv {
                                 writeCurrentSymbol(currentSymbol, writer);
                             }
 
-                            if (j + 1 == currentCsvLine.length() && scanner.hasNextLine()) {
-                                closeCurrentTrTagAndOpenNewTrTag(writer);
+                            if (i + 1 == currentCsvLine.length() && scanner.hasNextLine()) {
+                                needToCloseCurrentTrTagAndOpenNewTrTag = true;
                             }
                         } else {
                             isInQuotesToken = true;
                         }
                     }
 
-                    j++;
+                    i++;
                 }
-
-                token.delete(0, token.length());
             }
 
             setHtmlDocumentEndingTags(writer);
         } catch (FileNotFoundException e) {
-            System.out.println("File \"" + inputCsvFileName + "\" not found");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -149,10 +123,14 @@ public class Csv {
     }
 
     private void writeCurrentSymbol(char currentSymbol, PrintWriter writer) {
-        if (currentSymbol != '<' && currentSymbol != '>' && currentSymbol != '&') {
-            writer.print(currentSymbol);
+        if (currentSymbol == '<') {
+            writer.print("&lt;");
+        } else if (currentSymbol == '>') {
+            writer.print("&gt;");
+        } else if (currentSymbol == '&') {
+            writer.print("&amp;");
         } else {
-            writer.print(map.get(currentSymbol));
+            writer.print(currentSymbol);
         }
     }
 }
