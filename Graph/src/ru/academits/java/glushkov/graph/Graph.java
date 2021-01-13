@@ -6,29 +6,33 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.function.Consumer;
 
-public class Graph {
+public class Graph<E> {
     private final int[][] adjacencyArray;
     private final int size;
-    private ArrayList<String> verticesNames;
+    private final ArrayList<E> verticesData;
 
-    public Graph(int[][] array) {
-        if (array == null) {
+    public Graph(int[][] adjacencyArray) {
+        this(adjacencyArray, null);
+    }
+
+    public Graph(int[][] adjacencyArray, ArrayList<E> verticesData) {
+        if (adjacencyArray == null) {
             throw new NullPointerException("Constructor's array argument must be not null");
         }
 
-        int rowsCount = array.length;
+        int rowsCount = adjacencyArray.length;
 
         if (rowsCount == 0) {
             throw new IllegalArgumentException("Constructor's array argument length must be nonzero");
         }
 
-        for (int[] row : array) {
+        for (int[] row : adjacencyArray) {
             if (row == null) {
                 throw new NullPointerException("Elements of constructor's array argument must be not null");
             }
         }
 
-        int columnsCount = array[0].length;
+        int columnsCount = adjacencyArray[0].length;
 
         if (rowsCount != columnsCount) {
             throw new IllegalArgumentException(String.format(
@@ -37,51 +41,50 @@ public class Graph {
         }
 
         for (int i = 1; i < rowsCount; i++) {
-            if (array[i].length != columnsCount) {
+            if (adjacencyArray[i].length != columnsCount) {
                 throw new IllegalArgumentException(String.format(
                         "All rows in array argument must have the same length: rows from 0 to %d have length %d; row %d has length %d",
-                        i - 1, columnsCount, i, array[i].length));
+                        i - 1, columnsCount, i, adjacencyArray[i].length));
             }
         }
 
-        adjacencyArray = new int[rowsCount][];
+        this.adjacencyArray = new int[rowsCount][];
         size = rowsCount;
         int i = 0;
 
-        for (int[] row : array) {
-            adjacencyArray[i] = Arrays.copyOf(row, size);
+        for (int[] row : adjacencyArray) {
+            this.adjacencyArray[i] = Arrays.copyOf(row, size);
             i++;
         }
-    }
 
-    public Graph(int[][] array, ArrayList<String> verticesNames) {
-        this(array);
+        if (verticesData == null) {
+            this.verticesData = null;
 
-        if (verticesNames == null) {
-            throw new IllegalArgumentException("Constructor's argument verticesData must be not null");
+            return;
         }
 
-        if (size != verticesNames.size()) {
+        if (size != verticesData.size()) {
             throw new IllegalArgumentException(String.format(
                     "Argument verticesData size must be equal to graph size: verticesData size = %d; graph size = %d",
-                    verticesNames.size(), size));
+                    verticesData.size(), size));
         }
 
-        this.verticesNames = new ArrayList<>(verticesNames);
+        this.verticesData = new ArrayList<>(verticesData);
     }
 
-    public void walkInBreadth(Consumer<String> action) {
+    public void walkInBreadth(Consumer<? super E> action) {
         Queue<Integer> queue = new LinkedList<>();
 
         boolean[] visited = new boolean[size];
-        Arrays.fill(visited, false);
 
         int visitedCount = 0;
+        int nextIndexInVisitedArray = 0;
 
         while (visitedCount != size) {
-            for (int i = 0; i < size; i++) {
+            for (int i = nextIndexInVisitedArray; i < size; i++) {
                 if (!visited[i]) {
                     queue.add(i);
+                    nextIndexInVisitedArray = i + 1;
                     break;
                 }
             }
@@ -90,39 +93,36 @@ public class Graph {
                 int currentVertex = queue.remove();
 
                 if (!visited[currentVertex]) {
-                    if (verticesNames == null) {
-                        action.accept(Integer.valueOf(currentVertex).toString());
-                    } else {
-                        action.accept(verticesNames.get(currentVertex));
+                    makeActionForVertex(currentVertex, action);
+
+                    for (int i = 0; i < size; i++) {
+                        int element = adjacencyArray[currentVertex][i];
+
+                        if (element != 0 && !visited[i]) {
+                            queue.add(i);
+                        }
                     }
 
                     visited[currentVertex] = true;
                     visitedCount++;
                 }
-
-                for (int j = 0; j < size; j++) {
-                    int element = adjacencyArray[currentVertex][j];
-
-                    if (element != 0 && !visited[j]) {
-                        queue.add(j);
-                    }
-                }
             }
         }
     }
 
-    public void walkInDepth(Consumer<String> action) {
+    public void walkInDepth(Consumer<? super E> action) {
         ArrayList<Integer> stack = new ArrayList<>();
 
         boolean[] visited = new boolean[size];
-        Arrays.fill(visited, false);
 
         int visitedCount = 0;
+        int nextIndexInVisitedArray = 0;
 
         while (visitedCount != size) {
-            for (int i = 0; i < size; i++) {
+            for (int i = nextIndexInVisitedArray; i < size; i++) {
                 if (!visited[i]) {
                     stack.add(i);
+                    nextIndexInVisitedArray = i + 1;
                     break;
                 }
             }
@@ -131,24 +131,65 @@ public class Graph {
                 int currentVertex = stack.remove(stack.size() - 1);
 
                 if (!visited[currentVertex]) {
-                    if (verticesNames == null) {
-                        action.accept(Integer.valueOf(currentVertex).toString());
-                    } else {
-                        action.accept(verticesNames.get(currentVertex));
+                    makeActionForVertex(currentVertex, action);
+
+                    for (int i = size - 1; i >= 0; i--) {
+                        int element = adjacencyArray[currentVertex][i];
+
+                        if (element != 0 && !visited[i]) {
+                            stack.add(i);
+                        }
                     }
 
                     visited[currentVertex] = true;
                     visitedCount++;
                 }
-
-                for (int j = size - 1; j >= 0; j--) {
-                    int element = adjacencyArray[currentVertex][j];
-
-                    if (element != 0 && !visited[j]) {
-                        stack.add(j);
-                    }
-                }
             }
+        }
+    }
+
+    public void walkInDepthRecursive(Consumer<? super E> action) {
+        boolean[] visited = new boolean[size];
+        boolean hasNotVisitedVertices = true;
+        int nextIndexInVisitedArray = 0;
+        int i;
+
+        while (hasNotVisitedVertices) {
+            for (i = nextIndexInVisitedArray; i < size; i++) {
+                if (!visited[i]) {
+                    nextIndexInVisitedArray = i + 1;
+                    break;
+                }
+
+                hasNotVisitedVertices = false;
+            }
+
+            visit(i, action, visited);
+        }
+    }
+
+    private void visit(int vertexIndex, Consumer<? super E> action, boolean[] visited) {
+        if (!visited[vertexIndex]) {
+            makeActionForVertex(vertexIndex, action);
+            visited[vertexIndex] = true;
+        }
+
+        for (int i = 0; i < size; i++) {
+            int element = adjacencyArray[vertexIndex][i];
+
+            if (element != 0 && !visited[i]) {
+                visit(i, action, visited);
+            }
+        }
+    }
+
+    private void makeActionForVertex(int vertexIndex, Consumer<? super E> action) {
+        if (verticesData == null) {
+            System.out.print(vertexIndex + " ");
+        } else if (action == null) {
+            System.out.print(verticesData.get(vertexIndex) + " ");
+        } else {
+            action.accept(verticesData.get(vertexIndex));
         }
     }
 }

@@ -4,6 +4,7 @@ import ru.academits.java.glushkov.graph.Graph;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,7 +16,8 @@ public class Main {
                 {0, 0, 0, 0, 0, 1375, 727, 0},
                 {0, 0, 0, 0, 1375, 0, 878, 917},
                 {0, 0, 0, 0, 727, 878, 0, 0},
-                {0, 0, 0, 0, 0, 917, 0, 0}};
+                {0, 0, 0, 0, 0, 917, 0, 0}
+        };
 
         ArrayList<String> citiesNames = new ArrayList<>(Arrays.asList(
                 "Омск",
@@ -25,15 +27,40 @@ public class Main {
                 "Аделаида",
                 "Сидней",
                 "Мельбурн",
-                "Брисбен"));
+                "Брисбен")
+        );
 
-        Graph citiesGraph = new Graph(array, citiesNames);
+        System.out.println("1. Использование конструктора с двумя аргументами");
+
+        Graph<String> citiesGraph = new Graph<>(array, citiesNames);
+        Consumer<String> action = p -> System.out.print(p.toUpperCase() + " ");
 
         System.out.println("1) Обход графа в ширину");
-        citiesGraph.walkInBreadth(p -> System.out.print(p + " "));
+        citiesGraph.walkInBreadth(action);
 
         System.out.println();
         System.out.println("2) Обход графа в глубину");
-        citiesGraph.walkInDepth(p -> System.out.print(p + " "));
+        citiesGraph.walkInDepth(action);
+
+        System.out.println();
+        System.out.println("3) Обход графа в глубину с рекурсией");
+        citiesGraph.walkInDepthRecursive(action);
+
+        System.out.println();
+        System.out.println();
+        System.out.println("2. Использование конструктора с одним аргументом");
+
+        Graph<String> citiesGraph2 = new Graph<>(array);
+
+        System.out.println("1) Обход графа в ширину");
+        citiesGraph2.walkInBreadth(null);
+
+        System.out.println();
+        System.out.println("2) Обход графа в глубину");
+        citiesGraph2.walkInDepth(null);
+
+        System.out.println();
+        System.out.println("3) Обход графа в глубину с рекурсией");
+        citiesGraph2.walkInDepthRecursive(null);
     }
 }
