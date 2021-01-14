@@ -241,34 +241,33 @@ public class BinaryTree<T> {
         return parent.getLeftChild() == node;
     }
 
-    private int compare(T data1, T data2) {
-        if (comparator == null) {
-            if (data1 == null && data2 != null) {
-                return 1;
-            }
-
-            if (data1 != null && data2 == null) {
-                return -1;
-            }
-
-            if (data1 == null) {
-                return 0;
-            }
-
-            Comparable<T> d;
-
-            if (data1 instanceof Comparable) {
-                //noinspection unchecked
-                d = (Comparable<T>) data1;
-            } else {
-                throw new IllegalArgumentException("If using instance of BinaryTree class without comparator class of " +
-                        "data argument in methods add(T data), contains(T data) and remove(T data) must implement interface Comparable");
-            }
-
-            return d.compareTo(data2);
-        } else {
+    public int compare(T data1, T data2) {
+        if (comparator != null) {
             return comparator.compare(data1, data2);
         }
+
+        if (data1 == null && data2 != null) {
+            return 1;
+        }
+
+        if (data1 != null && data2 == null) {
+            return -1;
+        }
+
+        if (data1 == null) {
+            return 0;
+        }
+
+        if (!(data1 instanceof Comparable)) {
+            throw new IllegalArgumentException("If using instance of BinaryTree class without comparator class of " +
+                    "data argument in methods add(T data), contains(T data) and remove(T data) must implement interface Comparable");
+
+        }
+
+        //noinspection unchecked
+        Comparable<T> data1CastedToComparable = (Comparable<T>) data1;
+
+        return data1CastedToComparable.compareTo(data2);
     }
 
     @Override
