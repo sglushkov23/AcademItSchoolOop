@@ -241,7 +241,7 @@ public class BinaryTree<T> {
         return parent.getLeftChild() == node;
     }
 
-    public int compare(T data1, T data2) {
+    private int compare(T data1, T data2) {
         if (comparator != null) {
             return comparator.compare(data1, data2);
         }
