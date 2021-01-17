@@ -1,13 +1,15 @@
-package ru.academits.java.glushkov.view;
+package ru.academits.java.glushkov.temperature.view;
+
+import ru.academits.java.glushkov.temperature.model.Scale;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class InputOutputPanel extends JPanel {
     private final JTextField textField;
-    private final JComboBox<String> unitChooser;
+    private final JComboBox<Scale> scaleChooser;
 
-    public InputOutputPanel(String title, String[] units) {
+    public InputOutputPanel(String title, Scale[] scales) {
         setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(title),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
@@ -15,22 +17,30 @@ public class InputOutputPanel extends JPanel {
         textField = new JTextField(10);
         textField.setFont(new Font("CourierNew", Font.BOLD, 42));
 
-        unitChooser = new JComboBox<>(units);
-        unitChooser.setFont(new Font("CourierNew", Font.BOLD, 32));
+        scaleChooser = new JComboBox<>(scales);
+        scaleChooser.setFont(new Font("CourierNew", Font.BOLD, 32));
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(textField);
-        add(unitChooser);
+        add(scaleChooser);
         textField.setAlignmentX(LEFT_ALIGNMENT);
-        unitChooser.setAlignmentX(LEFT_ALIGNMENT);
+        scaleChooser.setAlignmentX(LEFT_ALIGNMENT);
+    }
+
+    public void setText(String text) {
+        textField.setText(text);
+    }
+
+    public String getText() {
+        return textField.getText();
     }
 
     public JTextField getTextField() {
         return textField;
     }
 
-    public JComboBox<String> getUnitChooser() {
-        return unitChooser;
+    public JComboBox<Scale> getScaleChooser() {
+        return scaleChooser;
     }
 
     @Override

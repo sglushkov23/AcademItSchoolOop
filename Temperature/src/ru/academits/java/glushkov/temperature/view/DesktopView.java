@@ -1,6 +1,7 @@
-package ru.academits.java.glushkov.view;
+package ru.academits.java.glushkov.temperature.view;
 
-import ru.academits.java.glushkov.controller.Controller;
+import ru.academits.java.glushkov.temperature.controller.Controller;
+import ru.academits.java.glushkov.temperature.model.Scale;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -13,21 +14,25 @@ public class DesktopView implements View {
     private final Controller controller;
     private InputOutputPanel inputPanel;
     private InputOutputPanel outputPanel;
-    private final HashMap<String, String[]> map;
+    private final Scale[] scales;
+    private final HashMap<Scale, Scale[]> map;
     private String inputText;
-    private String inputPanelOldUnit;
-    private String outputPanelOldUnit;
+    private Scale inputPanelOldScale;
+    private Scale outputPanelOldScale;
     private boolean isAllowedToListen;
 
     public DesktopView(Controller controller) {
-        map = new HashMap<>();
-        map.put("Celsius", new String[]{"Fahrenheit", "Kelvin"});
-        map.put("Fahrenheit", new String[]{"Celsius", "Kelvin"});
-        map.put("Kelvin", new String[]{"Celsius", "Fahrenheit"});
         this.controller = controller;
+        scales = this.controller.getConverter().getScales();
+        map = new HashMap<>();
+
+        for (Scale scale : scales) {
+            map.put(scale, getRemainingScales(scales, scale));
+        }
+
         inputText = "";
-        inputPanelOldUnit = "Celsius";
-        outputPanelOldUnit = "Fahrenheit";
+        inputPanelOldScale = scales[0];
+        outputPanelOldScale = scales[1];
         isAllowedToListen = true;
     }
 
@@ -39,13 +44,14 @@ public class DesktopView implements View {
             } catch (Exception ignored) {
             }
 
+            //JFrame.setDefaultLookAndFeelDecorated(true);
             JFrame frame = new JFrame("Temperature Converter");
             frame.setSize(500, 300);
             frame.setLocationRelativeTo(null);
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-            inputPanel = new InputOutputPanel("Input Panel", new String[]{"Celsius", "Fahrenheit", "Kelvin"});
-            outputPanel = new InputOutputPanel("Output Panel", new String[]{"Fahrenheit", "Kelvin"});
+            inputPanel = new InputOutputPanel("Input Panel", scales);
+            outputPanel = new InputOutputPanel("Output Panel", getRemainingScales(scales, scales[0]));
 
             outputPanel.getTextField().setEnabled(false);
             outputPanel.getTextField().setDisabledTextColor(new Color(0, 0, 0));
@@ -99,34 +105,36 @@ public class DesktopView implements View {
             c4.insets = new Insets(inset, inset, inset, inset);
             mainPanel.add(convertButton, c4);
 
-            inputPanel.getUnitChooser().addActionListener(e -> {
-                String unit = (String) inputPanel.getUnitChooser().getSelectedItem();
+            inputPanel.getScaleChooser().addActionListener(e -> {
+                Scale scale = (Scale) inputPanel.getScaleChooser().getSelectedItem();
 
-                if (!inputPanelOldUnit.equals(unit)) {
-                    outputPanel.getTextField().setText("");
+                if (!inputPanelOldScale.equals(scale)) {
+                    outputPanel.setText("");
 
                     isAllowedToListen = false;
-                    outputPanel.getUnitChooser().removeAllItems();
-                    outputPanel.getUnitChooser().insertItemAt(map.get(unit)[0], 0);
-                    outputPanel.getUnitChooser().insertItemAt(map.get(unit)[1], 1);
+                    outputPanel.getScaleChooser().removeAllItems();
+
+                    for (int i = 0; i < map.size() - 1; i++) {
+                        outputPanel.getScaleChooser().insertItemAt(map.get(scale)[i], i);
+                    }
 
                     isAllowedToListen = true;
-                    outputPanel.getUnitChooser().setSelectedIndex(0);
+                    outputPanel.getScaleChooser().setSelectedIndex(0);
 
-                    inputPanelOldUnit = unit;
+                    inputPanelOldScale = scale;
                 }
             });
 
-            outputPanel.getUnitChooser().addActionListener(e -> {
+            outputPanel.getScaleChooser().addActionListener(e -> {
                 if (!isAllowedToListen) {
                     return;
                 }
 
-                String unit = (String) outputPanel.getUnitChooser().getSelectedItem();
+                Scale scale = (Scale) outputPanel.getScaleChooser().getSelectedItem();
 
-                if (!outputPanelOldUnit.equals(unit)) {
-                    outputPanel.getTextField().setText("");
-                    outputPanelOldUnit = unit;
+                if (!outputPanelOldScale.equals(scale)) {
+                    outputPanel.setText("");
+                    outputPanelOldScale = scale;
                 }
             });
 
@@ -147,20 +155,20 @@ public class DesktopView implements View {
                 }
 
                 public void clear() {
-                    if (!inputText.equals(inputPanel.getTextField().getText())) {
-                        outputPanel.getTextField().setText("");
+                    if (!inputText.equals(inputPanel.getText())) {
+                        outputPanel.setText("");
                     }
                 }
             });
 
             convertButton.addActionListener(e -> {
                 try {
-                    inputText = inputPanel.getTextField().getText();
+                    inputText = inputPanel.getText();
                     double temperature = Double.parseDouble(inputText);
-                    controller.convertTemperature(
+                    controller.convert(
                             temperature,
-                            (String) Objects.requireNonNull(inputPanel.getUnitChooser().getSelectedItem()),
-                            (String) outputPanel.getUnitChooser().getSelectedItem());
+                            (Scale) Objects.requireNonNull(inputPanel.getScaleChooser().getSelectedItem()),
+                            (Scale) outputPanel.getScaleChooser().getSelectedItem());
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(frame, "Temperature must be a number");
                 } catch (IllegalArgumentException ex) {
@@ -170,12 +178,30 @@ public class DesktopView implements View {
 
             frame.setContentPane(mainPanel);
             frame.pack();
+            frame.setMinimumSize(frame.getSize());
             frame.setVisible(true);
         });
     }
 
     @Override
-    public void setTemperature(double temperature) {
-        outputPanel.getTextField().setText(String.format("%.2f", temperature));
+    public void setOutputTemperature(double temperature) {
+        outputPanel.setText(String.format("%.2f", temperature));
+    }
+
+    private Scale[] getRemainingScales(Scale[] scales, Scale scale) {
+        Scale[] remainingScales = new Scale[scales.length - 1];
+
+        int i = 0;
+
+        for (Scale e : scales) {
+            if (e == scale) {
+                continue;
+            }
+
+            remainingScales[i] = e;
+            i++;
+        }
+
+        return remainingScales;
     }
 }
