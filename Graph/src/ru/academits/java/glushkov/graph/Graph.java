@@ -169,9 +169,9 @@ public class Graph<E> {
     }
 
     private void visit(int vertexIndex, Consumer<? super E> action, boolean[] visited) {
-        if (visited[vertexIndex]) {
+        /*if (visited[vertexIndex]) {
             return;
-        }
+        }*/
 
         makeActionForVertex(vertexIndex, action);
         visited[vertexIndex] = true;
