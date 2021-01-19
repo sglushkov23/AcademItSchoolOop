@@ -17,11 +17,11 @@ public class Main {
 
         Comparator<Integer> comparator = (o1, o2) -> {
             if (o1 == null && o2 != null) {
-                return 1;
+                return -1;
             }
 
             if (o1 != null && o2 == null) {
-                return -1;
+                return 1;
             }
 
             if (o1 == null) {
@@ -108,35 +108,5 @@ public class Main {
         System.out.println("8) Обход в глубину с рекурсией");
 
         tree3.walkInDepthRecursive(action);
-
-        System.out.println();
-        System.out.println();
-        System.out.println("9) Сравнение деревьев, получаемых с компаратором и без компаратора");
-
-        int minNumber = -1000;
-        int maxNumber = 1000;
-
-        Random random = new Random();
-        List<Integer> list2 = new ArrayList<>();
-
-        for (int i = 0; i < 200; i++) {
-            if (i % 10 == 5) {
-                list2.add(null);
-                continue;
-            }
-
-            list2.add(minNumber + random.nextInt(maxNumber - minNumber + 1));
-        }
-
-        BinaryTree<Integer> tree4 = new BinaryTree<>(list2, comparator);
-        BinaryTree<Integer> tree5 = new BinaryTree<>(list2);
-
-        String tree4AsString = tree4.toString();
-        String tree5AsString = tree5.toString();
-
-        System.out.printf("list2 = %s; size = %d%n", list2, list2.size());
-        System.out.printf("tree4 = %s; size = %d%n", tree4AsString, tree4.getSize());
-        System.out.printf("tree5 = %s; size = %d%n", tree5AsString, tree5.getSize());
-        System.out.println("Строки, соответствующие деревьям tree4 и tree5, идентичны: " + tree4AsString.equals(tree5AsString));
     }
 }
