@@ -261,7 +261,6 @@ public class BinaryTree<T> {
         if (!(data1 instanceof Comparable)) {
             throw new IllegalArgumentException("If using instance of BinaryTree class without comparator class of " +
                     "data argument in methods add(T data), contains(T data) and remove(T data) must implement interface Comparable");
-
         }
 
         //noinspection unchecked
