@@ -247,11 +247,11 @@ public class BinaryTree<T> {
         }
 
         if (data1 == null && data2 != null) {
-            return 1;
+            return -1;
         }
 
         if (data1 != null && data2 == null) {
-            return -1;
+            return 1;
         }
 
         if (data1 == null) {
