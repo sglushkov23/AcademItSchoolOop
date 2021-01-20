@@ -6,24 +6,20 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class Csv {
-    private final String inputCsvFileName;
-    private final String outputHtmlFileName;
-
-    public Csv(String inputCsvFileName, String outputHtmlFileName) {
-        this.inputCsvFileName = inputCsvFileName;
-        this.outputHtmlFileName = outputHtmlFileName;
-    }
-
-    public void convertCsvToHtml() {
+    public void convertCsvToHtml(String inputCsvFileName, String outputHtmlFileName) throws FileNotFoundException {
         try (Scanner scanner = new Scanner(new FileInputStream(inputCsvFileName));
              PrintWriter writer = new PrintWriter(outputHtmlFileName)) {
-            setHtmlDocumentStartingTags(writer);
+            setHtmlDocumentStartingTags(writer, outputHtmlFileName);
 
             boolean isInQuotesToken = false;
             boolean needToCloseCurrentTrTagAndOpenNewTrTag = false;
 
             while (scanner.hasNextLine()) {
                 String currentCsvLine = scanner.nextLine();
+
+                if (isInQuotesToken && !currentCsvLine.equals("")) {
+                    writer.print("<br>");
+                }
 
                 if (needToCloseCurrentTrTagAndOpenNewTrTag && !currentCsvLine.equals("")) {
                     closeCurrentTrTagAndOpenNewTrTag(writer);
@@ -84,8 +80,6 @@ public class Csv {
             }
 
             setHtmlDocumentEndingTags(writer);
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
         }
     }
 
@@ -101,12 +95,13 @@ public class Csv {
         writer.print("\t\t\t\t<td>");
     }
 
-    private void setHtmlDocumentStartingTags(PrintWriter writer) {
+    private void setHtmlDocumentStartingTags(PrintWriter writer, String title) {
         //noinspection SpellCheckingInspection
         writer.println("<!DOCTYPE html>");
         writer.println("<html>");
         writer.println("\t<head>");
         writer.println("\t\t<meta charset=\"UTF-8\">");
+        writer.println("\t\t<title>" + title + "</title>");
         writer.println("\t</head>");
         writer.println("\t<body>");
         writer.println("\t\t<table border=\"1\">");

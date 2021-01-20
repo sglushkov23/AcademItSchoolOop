@@ -2,6 +2,8 @@ package ru.academits.java.glushkov.csv_main;
 
 import ru.academits.java.glushkov.csv.Csv;
 
+import java.io.FileNotFoundException;
+
 public class Main {
     public static void main(String[] args) {
         if (args.length == 1 && args[0].equals("-help")) {
@@ -18,8 +20,14 @@ public class Main {
             return;
         }
 
-        Csv csv = new Csv(args[0], args[1]);
-        csv.convertCsvToHtml();
+        Csv csv = new Csv();
+
+        try {
+            csv.convertCsvToHtml(args[0], args[1]);
+        } catch (FileNotFoundException e) {
+            System.out.printf("File \"%s\" not found or names of files \"%s\" and/or \"%s\" contain syntax error%n",
+                    args[0], args[0], args[1]);
+        }
     }
 
     public static void displayHelp() {
