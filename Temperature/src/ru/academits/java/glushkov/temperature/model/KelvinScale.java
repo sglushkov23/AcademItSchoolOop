@@ -2,7 +2,7 @@ package ru.academits.java.glushkov.temperature.model;
 
 public class KelvinScale implements Scale {
     private static final double LOWEST_TEMPERATURE = 0;
-    private static final String scaleName = "Kelvin";
+    private static final String SCALE_NAME = "Kelvin";
 
     @Override
     public double convertToKelvin(double kelvinTemperature) {
@@ -18,13 +18,13 @@ public class KelvinScale implements Scale {
 
     @Override
     public String toString() {
-        return scaleName;
+        return SCALE_NAME;
     }
 
     private void checkTemperature(double temperature) {
         if (temperature < LOWEST_TEMPERATURE) {
             throw new IllegalArgumentException(String.format(
-                    "The temperature on the %s scale must be not less than %.2f degrees", scaleName, LOWEST_TEMPERATURE)
+                    "The temperature on the %s scale must be not less than %.2f degrees", SCALE_NAME, LOWEST_TEMPERATURE)
             );
         }
     }
@@ -35,7 +35,7 @@ public class KelvinScale implements Scale {
         int hash = 1;
 
         hash = prime * hash + Double.hashCode(LOWEST_TEMPERATURE);
-        hash = prime * hash + scaleName.hashCode();
+        hash = prime * hash + SCALE_NAME.hashCode();
 
         return hash;
     }
