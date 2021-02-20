@@ -20,7 +20,7 @@ public class CountersPanel extends JPanel {
         IconsCreator iconsCreator = new IconsCreator();
         Font font = new Font("CourierNew", Font.BOLD, 32);
 
-        String path1 = "..\\resources\\timer-logo.png";
+        String path1 = "..\\resources\\timer_icon.png";
         watchIcon = iconsCreator.createImageIcon(path1, "watch icon");
 
         String path2 = "..\\resources\\mine_icon.png";
