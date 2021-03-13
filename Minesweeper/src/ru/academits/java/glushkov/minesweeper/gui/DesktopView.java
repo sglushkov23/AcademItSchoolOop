@@ -14,33 +14,35 @@ public class DesktopView implements View {
     private int columnsCount;
     private int minedCellsCount;
     private boolean isAllowedToListen = true;
-    JButton[] cells;
-    JFrame frame;
+    private Cell[] cells;
+    private JFrame frame;
     private int mainWindowWidth;
     private int mainWindowHeight;
-    private int gamePanelWidth;
-    private int gamePanelHeight;
     private int levelSelectionPanelWidth;
     private int levelSelectionPanelHeight;
-    private int cellSize;
+    private int startCellSize;
+    private int currentCellSize;
+    private int minCellSize;
+    private int maxCellSize;
+    private Font cellFont;
     private ImageIcon flagIcon;
     private ImageIcon questionIcon;
     private ImageIcon mineIcon;
     private ImageIcon explosionIcon;
+    private Image flagImage;
+    private Image questionImage;
+    private Image mineImage;
+    private Image explosionImage;
     private boolean isShownGamePanel;
     private boolean isFirstClick;
-    private GridBagConstraints gamePanelConstraints;
-    private GridBagConstraints countersPanelConstraints;
-    private GridBagConstraints commandButtonsPanelConstraints;
-    private GridBagConstraints levelSelectionPanelConstraints;
     private JPanel mainPanel;
     private JPanel levelSelectionPanel;
     private JPanel gamePanel;
+    private JPanel gamePanelContainer;
+    private JPanel countersPanelContainer;
     private CustomLevelSelectionPanel customLevelSelectionPanel;
     private CountersPanel countersPanel;
     private Thread stopwatchThread;
-    private final int commandButtonHeight = 50;
-    private final int commandButtonsCount = 4;
 
     public DesktopView(Controller controller) {
         this.controller = controller;
@@ -54,20 +56,8 @@ public class DesktopView implements View {
         }
 
         @Override
-        public void mouseClicked(MouseEvent e) {
+        public void mousePressed(MouseEvent e) {
             if (!isAllowedToListen) {
-                return;
-            }
-
-            if (e.getButton() == MouseEvent.BUTTON1) {
-                controller.updateOnLeftClick(number);
-
-                if (isFirstClick) {
-                    stopwatchThread = new Thread(new Stopwatch(countersPanel));
-                    stopwatchThread.start();
-                    isFirstClick = false;
-                }
-
                 return;
             }
 
@@ -75,7 +65,17 @@ public class DesktopView implements View {
                 return;
             }
 
-            controller.updateOnRightClick(number);
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                controller.updateOnLeftClick(number);
+            } else {
+                controller.updateOnRightClick(number);
+            }
+
+            if (isFirstClick) {
+                stopwatchThread = new Thread(new Stopwatch(countersPanel));
+                stopwatchThread.start();
+                isFirstClick = false;
+            }
         }
     }
 
@@ -84,11 +84,20 @@ public class DesktopView implements View {
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+                UIManager.put("Button.disabledText", new Color(50, 50, 50));
             } catch (Exception ignored) {
             }
 
+            gamePanelContainer = new JPanel();
+            gamePanelContainer.setLayout(new GridBagLayout());
+            gamePanelContainer.setOpaque(true);
+            gamePanelContainer.setBackground(new Color(100, 100, 100));
+
+            countersPanelContainer = new JPanel();
+            countersPanelContainer.setOpaque(true);
+            countersPanelContainer.setBackground(new Color(150, 150, 150));
+
             setMainWindowGeometricalParameters();
-            setConstraintsForMainPanelAndCommandButtons();
 
             mainPanel = new JPanel();
             GridBagLayout gridBagLayout = new GridBagLayout();
@@ -145,7 +154,7 @@ public class DesktopView implements View {
 
                 int dialogResult = JOptionPane.showOptionDialog(
                         frame,
-                        customLevelSelectionPanel,
+                        customLevelSelectionPanel.getPanel(),
                         "Field Parameters Selection",
                         JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE,
@@ -166,32 +175,30 @@ public class DesktopView implements View {
             levelSelectionPanel.add(hardButton);
             levelSelectionPanel.add(customButton);
 
-            JPanel commandButtonsPanel = new JPanel();
-            commandButtonsPanel.setLayout(new GridLayout(4, 1, 10, 10));
+            JMenuBar menuBar = new JMenuBar();
+            JMenu menu = new JMenu("Menu");
+            menu.setMnemonic(KeyEvent.VK_M);
+            menuBar.add(menu);
 
-            Dimension dimension1 = new Dimension(mainWindowWidth / 6, commandButtonHeight * commandButtonsCount);
-            commandButtonsPanel.setPreferredSize(dimension1);
-            commandButtonsPanel.setMinimumSize(dimension1);
-            commandButtonsPanel.setMaximumSize(dimension1);
-            commandButtonsPanel.setOpaque(false);
+            JMenuItem newGameItem = new JMenuItem("New Game", KeyEvent.VK_N);
+            newGameItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
 
-            JButton exitButton = new JButton("Exit");
-            JButton aboutButton = new JButton("About");
-            JButton newGameButton = new JButton("New Game");
-            JButton highScoresButton = new JButton("High Scores");
+            JMenuItem highScoresItem = new JMenuItem("High Scores", KeyEvent.VK_H);
+            highScoresItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
 
-            commandButtonsPanel.add(exitButton);
-            commandButtonsPanel.add(aboutButton);
-            commandButtonsPanel.add(newGameButton);
-            commandButtonsPanel.add(highScoresButton);
+            JMenuItem aboutItem = new JMenuItem("About", KeyEvent.VK_A);
+            aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
 
-            exitButton.addActionListener(e -> System.exit(0));
+            JMenuItem exitItem = new JMenuItem("Exit", KeyEvent.VK_X);
+            exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
 
-            newGameButton.addActionListener(e -> {
+            newGameItem.addActionListener(e -> {
                 if (isShownGamePanel) {
-                    mainPanel.remove(gamePanel);
-                    mainPanel.remove(countersPanel);
-                    mainPanel.add(levelSelectionPanel, levelSelectionPanelConstraints);
+                    mainPanel.remove(gamePanelContainer);
+                    mainPanel.remove(countersPanelContainer);
+                    gamePanelContainer.remove(gamePanel);
+                    countersPanelContainer.remove(countersPanel);
+                    mainPanel.add(levelSelectionPanel);
                     mainPanel.validate();
                     mainPanel.repaint();
                     isShownGamePanel = false;
@@ -199,12 +206,12 @@ public class DesktopView implements View {
                 }
             });
 
-            highScoresButton.addActionListener(e -> {
+            highScoresItem.addActionListener(e -> {
                 HighScoresPanel highScoresPanel = new HighScoresPanel(controller.getRecordData());
 
                 JOptionPane.showOptionDialog(
                         frame,
-                        highScoresPanel,
+                        highScoresPanel.getPanel(),
                         "High Scores",
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.INFORMATION_MESSAGE,
@@ -214,15 +221,30 @@ public class DesktopView implements View {
                 );
             });
 
+            aboutItem.addActionListener(e -> {
+                String message = String.format("Minesweeper version 1.0.1%nBuilt on March 12, 2021%nAuthor: Glushkov Sergey");
+                JOptionPane.showMessageDialog(frame, message);
+            });
+
+            exitItem.addActionListener(e -> System.exit(0));
+
+            menu.add(newGameItem);
+            menu.addSeparator();
+            menu.add(highScoresItem);
+            menu.addSeparator();
+            menu.add(aboutItem);
+            menu.addSeparator();
+            menu.add(exitItem);
+
             mainPanel.setBackground(new Color(125, 125, 125));
-            mainPanel.add(levelSelectionPanel, levelSelectionPanelConstraints);
-            mainPanel.add(commandButtonsPanel, commandButtonsPanelConstraints);
+            mainPanel.add(levelSelectionPanel);
 
             frame = new JFrame("Minesweeper");
             frame.setSize(mainWindowWidth, mainWindowHeight);
             frame.setLocationRelativeTo(null);
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.setContentPane(mainPanel);
+            frame.setJMenuBar(menuBar);
             frame.setMinimumSize(frame.getSize());
             frame.setVisible(true);
         });
@@ -237,10 +259,15 @@ public class DesktopView implements View {
         } else {
             if (data.equals("0")) {
                 cells[cellNumber].setBackground(new Color(255, 255, 255));
+            } else {
+                cells[cellNumber].setText(data);
             }
 
             cells[cellNumber].setIcon(null);
-            cells[cellNumber].setText(data);
+
+            if (!data.equals("")) {
+                cells[cellNumber].setEnabled(false);
+            }
         }
 
         if (countersPanel.getMinesCount() != activeMinesCount) {
@@ -257,15 +284,23 @@ public class DesktopView implements View {
     public void showMinedCell(int cellNumber, boolean isWin) {
         if (isWin) {
             cells[cellNumber].setIcon(mineIcon);
+            cells[cellNumber].setDisabledIcon(mineIcon);
         } else {
             cells[cellNumber].setIcon(explosionIcon);
+            cells[cellNumber].setDisabledIcon(explosionIcon);
         }
+
+        cells[cellNumber].setEnabled(false);
     }
 
     @Override
     public void disableField() {
         stopwatchThread.interrupt();
         isAllowedToListen = false;
+
+        for (Cell cell : cells) {
+            cell.setEnabled(false);
+        }
     }
 
     @Override
@@ -275,15 +310,29 @@ public class DesktopView implements View {
 
     private void createIcons() {
         double resizeCoefficient = 0.8;
-        int iconSize = (int) (resizeCoefficient * cellSize);
-        String path = "..\\resources\\";
+        int iconSize = (int) (resizeCoefficient * currentCellSize);
+        //String path = "..\\resources\\";
+        String path = "";
 
-        IconsCreator iconsCreator = new IconsCreator();
+        flagImage = IconsCreator.createImage(path + "flag.png", "flag");
+        questionImage = IconsCreator.createImage(path + "question_mark.png", "question");
+        mineImage = IconsCreator.createImage(path + "mine.png", "mine");
+        explosionImage = IconsCreator.createImage(path + "explosion.png", "exploded_mine");
 
-        flagIcon = iconsCreator.createImageIcon(path + "flag.png", "flag", iconSize);
-        questionIcon = iconsCreator.createImageIcon(path + "question_mark.png", "question", iconSize);
-        mineIcon = iconsCreator.createImageIcon(path + "mine.png", "mine", iconSize);
-        explosionIcon = iconsCreator.createImageIcon(path + "explosion.png", "exploded_mine", iconSize);
+        flagIcon = IconsCreator.createImageIcon(flagImage, iconSize);
+        questionIcon = IconsCreator.createImageIcon(questionImage, iconSize);
+        mineIcon = IconsCreator.createImageIcon(mineImage, iconSize);
+        explosionIcon = IconsCreator.createImageIcon(explosionImage, iconSize);
+    }
+
+    private void resizeIcons() {
+        double resizeCoefficient = 0.8;
+        int iconSize = (int) (resizeCoefficient * currentCellSize);
+
+        IconsCreator.setResizedImage(flagIcon, flagImage, iconSize);
+        IconsCreator.setResizedImage(questionIcon, questionImage, iconSize);
+        IconsCreator.setResizedImage(mineIcon, mineImage, iconSize);
+        IconsCreator.setResizedImage(explosionIcon, explosionImage, iconSize);
     }
 
     private void setGameParameters() {
@@ -310,76 +359,24 @@ public class DesktopView implements View {
         int taskBarHeight = 50;
         mainWindowHeight = screenSize.height - taskBarHeight;
 
+        gamePanelContainer.setPreferredSize(new Dimension((int) (0.98 * mainWindowWidth * 4 / 5), (int) (0.9 * mainWindowHeight)));
+        countersPanelContainer.setPreferredSize(new Dimension((int) (0.98 * mainWindowWidth / 5), (int) (0.9 * mainWindowHeight)));
+
         levelSelectionPanelWidth = (int) (0.95 * mainWindowWidth * 4 / 5);
         levelSelectionPanelHeight = levelSelectionPanelWidth / 4 - 1;
     }
 
-    private void setGamePanelGeometricalParameters() {
-        if (rowsCount == columnsCount) {
-            cellSize = mainWindowHeight / rowsCount - 1;
-        } else {
-            cellSize = mainWindowWidth * 4 / 5 / columnsCount - 1;
+    private void setCellSizes() {
+        int maxRowsCount = 24;
+        int maxColumnsCount = 30;
 
-            if (cellSize * rowsCount > mainWindowHeight) {
-                cellSize = mainWindowHeight / rowsCount - 1;
-            }
-        }
-
-        gamePanelWidth = cellSize * columnsCount;
-        //gamePanelHeight = cellSize * rowsCount;
-        gamePanelHeight = mainWindowHeight;
-    }
-
-    private void setConstraintsForMainPanelAndCommandButtons() {
-        int inset = 10;
-
-        commandButtonsPanelConstraints = new GridBagConstraints();
-        commandButtonsPanelConstraints.fill = GridBagConstraints.BOTH;
-        commandButtonsPanelConstraints.weightx = 0.5;
-        commandButtonsPanelConstraints.weighty = 0.5;
-        commandButtonsPanelConstraints.gridwidth = mainWindowWidth / 6;
-        commandButtonsPanelConstraints.gridheight = commandButtonHeight * commandButtonsCount;
-        commandButtonsPanelConstraints.gridx = mainWindowWidth * 4 / 5;
-        commandButtonsPanelConstraints.gridy = mainWindowHeight - commandButtonsCount * commandButtonHeight;
-        commandButtonsPanelConstraints.insets = new Insets(inset, inset, inset, inset);
-
-        levelSelectionPanelConstraints = new GridBagConstraints();
-        levelSelectionPanelConstraints.fill = GridBagConstraints.BOTH;
-        levelSelectionPanelConstraints.weightx = 0.5;
-        levelSelectionPanelConstraints.weighty = 0.5;
-        levelSelectionPanelConstraints.gridwidth = levelSelectionPanelWidth;
-        levelSelectionPanelConstraints.gridheight = levelSelectionPanelHeight;
-        levelSelectionPanelConstraints.gridx = 0;
-        levelSelectionPanelConstraints.gridy = 0;
-        levelSelectionPanelConstraints.insets = new Insets(inset, inset, inset, inset);
-    }
-
-    private void setConstraintsForGamePanel() {
-        int inset = 10;
-
-        gamePanelConstraints = new GridBagConstraints();
-        gamePanelConstraints.fill = GridBagConstraints.BOTH;
-        gamePanelConstraints.weightx = 0.5;
-        gamePanelConstraints.weighty = 0.5;
-        gamePanelConstraints.gridwidth = gamePanelWidth;
-        gamePanelConstraints.gridheight = gamePanelHeight;
-        gamePanelConstraints.gridx = 0;
-        gamePanelConstraints.gridy = 0;
-        gamePanelConstraints.insets = new Insets(inset, inset, inset, inset);
-    }
-
-    private void setConstraintsForCountersPanel() {
-        int inset = 10;
-
-        countersPanelConstraints = new GridBagConstraints();
-        countersPanelConstraints.fill = GridBagConstraints.BOTH;
-        countersPanelConstraints.weightx = 0.5;
-        countersPanelConstraints.weighty = 0;
-        countersPanelConstraints.gridwidth = mainWindowWidth / 6;
-        countersPanelConstraints.gridheight = (int) (1.5 * countersPanel.getIconsHeight());
-        countersPanelConstraints.gridx = mainWindowWidth * 4 / 5;
-        countersPanelConstraints.gridy = 0;
-        countersPanelConstraints.insets = new Insets(inset, inset, inset, inset);
+        startCellSize = Math.min(mainWindowHeight / maxRowsCount - 1, mainWindowWidth * 4 / 5 / maxColumnsCount - 1);
+        currentCellSize = startCellSize;
+        minCellSize = (int) (0.95 * startCellSize);
+        maxCellSize = Math.min(
+                (int) gamePanelContainer.getPreferredSize().getWidth() / columnsCount + 1,
+                (int) gamePanelContainer.getPreferredSize().getHeight() / rowsCount + 1
+        );
     }
 
     private void createGamePanel() {
@@ -388,16 +385,16 @@ public class DesktopView implements View {
         gamePanel.setOpaque(false);
 
         int cellsCount = rowsCount * columnsCount;
-        cells = new JButton[cellsCount];
+        cells = new Cell[cellsCount];
 
-        Font font = new Font("CourierNew", Font.BOLD, (int) (0.4 * cellSize));
+        cellFont = new Font("CourierNew", Font.BOLD, (int) (0.4 * startCellSize));
         Color color = new Color(50, 50, 50);
 
         for (int i = 0; i < cellsCount; i++) {
-            cells[i] = new Cell(cellSize);
+            cells[i] = new Cell(startCellSize);
             cells[i].setMargin(new Insets(0, 0, 0, 0));
             cells[i].addMouseListener(new NumberedMouseListener(i));
-            cells[i].setFont(font);
+            cells[i].setFont(cellFont);
             cells[i].setForeground(color);
             gamePanel.add(cells[i]);
         }
@@ -405,23 +402,66 @@ public class DesktopView implements View {
 
     private void showGamePanel() {
         setGameParameters();
-        setGamePanelGeometricalParameters();
+        setCellSizes();
         createIcons();
-        setConstraintsForGamePanel();
         createGamePanel();
         mainPanel.remove(levelSelectionPanel);
-        mainPanel.add(gamePanel, gamePanelConstraints);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1;
+        c.weighty = 1;
+
+        mainPanel.add(gamePanelContainer, c);
+        mainPanel.add(countersPanelContainer, c);
+        gamePanelContainer.add(gamePanel);
+
+        gamePanel.addMouseWheelListener(new MouseAdapter() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int rotation = e.getWheelRotation();
+                double enlargementCoefficient = 1.05;
+
+                if (rotation < 0 && currentCellSize * enlargementCoefficient <= maxCellSize) {
+                    currentCellSize *= enlargementCoefficient;
+                } else if (rotation > 0 && currentCellSize / enlargementCoefficient >= minCellSize) {
+                    currentCellSize /= enlargementCoefficient;
+                } else {
+                    if (currentCellSize * enlargementCoefficient > maxCellSize) {
+                        currentCellSize = maxCellSize;
+                    } else if (currentCellSize / enlargementCoefficient < minCellSize) {
+                        currentCellSize = minCellSize;
+                    }
+                }
+
+                resizeGamePanel();
+            }
+        });
+
         mainPanel.validate();
         mainPanel.repaint();
         isShownGamePanel = true;
         isFirstClick = true;
     }
 
+    private void resizeGamePanel() {
+        float fontSize = (int) (0.4 * currentCellSize);
+        cellFont = cellFont.deriveFont(fontSize);
+        resizeIcons();
+
+        for (Cell cell : cells) {
+            cell.setSize(currentCellSize);
+            cell.setFont(cellFont);
+        }
+
+        gamePanelContainer.validate();
+        gamePanelContainer.repaint();
+    }
+
     private void showCountersPanel() {
         String title = String.format("%s %d x %d", level, rowsCount, columnsCount);
         countersPanel = new CountersPanel(title, minedCellsCount);
-        setConstraintsForCountersPanel();
-        mainPanel.add(countersPanel, countersPanelConstraints);
+        countersPanelContainer.add(countersPanel);
         mainPanel.validate();
         mainPanel.repaint();
     }

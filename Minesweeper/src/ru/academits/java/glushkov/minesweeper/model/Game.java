@@ -1,7 +1,5 @@
 package ru.academits.java.glushkov.minesweeper.model;
 
-import com.sun.source.tree.Tree;
-
 import java.util.ArrayList;
 import java.util.TreeSet;
 
@@ -10,7 +8,7 @@ public interface Game {
 
     void setTime(String duration);
 
-    Object[][] getRecordData();
+    String[][] getRecordData();
 
     void selectCell(int cellNumber);
 

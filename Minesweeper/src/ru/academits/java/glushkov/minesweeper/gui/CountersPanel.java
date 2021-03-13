@@ -6,8 +6,6 @@ import java.awt.*;
 public class CountersPanel extends JPanel {
     private final JLabel timeLabel;
     private final JLabel minesCountLabel;
-    ImageIcon watchIcon;
-    ImageIcon mineIcon;
 
     public CountersPanel(String title, int startingMinesCount) {
         setBorder(BorderFactory.createCompoundBorder(
@@ -16,15 +14,15 @@ public class CountersPanel extends JPanel {
         );
 
         setOpaque(false);
-
-        IconsCreator iconsCreator = new IconsCreator();
         Font font = new Font("CourierNew", Font.BOLD, 32);
 
-        String path1 = "..\\resources\\timer_icon.png";
-        watchIcon = iconsCreator.createImageIcon(path1, "watch icon");
+        //String path1 = "..\\resources\\timer_icon.png";
+        String path1 = "timer_icon.png";
+        ImageIcon watchIcon = IconsCreator.createImageIcon(path1, "watch icon");
 
-        String path2 = "..\\resources\\mine_icon.png";
-        mineIcon = iconsCreator.createImageIcon(path2, "mine icon");
+        //String path2 = "..\\resources\\mine_icon.png";
+        String path2 = "mine_icon.png";
+        ImageIcon mineIcon = IconsCreator.createImageIcon(path2, "mine icon");
 
         timeLabel = new JLabel("00:00:00", watchIcon, JLabel.LEFT);
         timeLabel.setHorizontalTextPosition(JLabel.RIGHT);
@@ -38,7 +36,7 @@ public class CountersPanel extends JPanel {
 
         add(Box.createGlue());
         add(timeLabel);
-        add(Box.createVerticalStrut(5));
+        add(Box.createVerticalStrut(10));
         add(minesCountLabel);
         add(Box.createGlue());
 
@@ -60,10 +58,6 @@ public class CountersPanel extends JPanel {
 
     public String getCurrentTime() {
         return timeLabel.getText();
-    }
-
-    public int getIconsHeight() {
-        return watchIcon.getIconHeight() + mineIcon.getIconHeight();
     }
 
     @Override

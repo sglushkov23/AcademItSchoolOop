@@ -5,12 +5,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 
-public class SliderPanel extends JPanel{
+public class SliderPanel {
     private final JSlider slider;
     private final JTextField textField;
+    private final JPanel panel;
 
     public SliderPanel(String title, int min, int max) {
-        setBorder(BorderFactory.createCompoundBorder(
+        panel = new JPanel();
+
+        panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(title),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
@@ -21,12 +24,16 @@ public class SliderPanel extends JPanel{
         textField.setEnabled(false);
         textField.setDisabledTextColor(new Color(0, 0, 0));
 
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        add(slider);
-        add(Box.createHorizontalStrut(5));
-        add(textField);
-        textField.setAlignmentY(BOTTOM_ALIGNMENT);
-        slider.setAlignmentY(BOTTOM_ALIGNMENT);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(slider);
+        panel.add(Box.createHorizontalStrut(5));
+        panel.add(textField);
+        textField.setAlignmentY(JPanel.BOTTOM_ALIGNMENT);
+        slider.setAlignmentY(JPanel.BOTTOM_ALIGNMENT);
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 
     public int getValue() {

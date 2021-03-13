@@ -1,6 +1,5 @@
 package ru.academits.java.glushkov.minesweeper.model;
 
-import java.io.*;
 import java.util.*;
 
 public class MinesweeperGame implements Game {
@@ -20,9 +19,6 @@ public class MinesweeperGame implements Game {
     private boolean isWin;
     private String message;
     private String time;
-    private String recordTime;
-    private boolean isRecord;
-    private static final String GAME_RESULTS_FILE_PATH = "Minesweeper\\src\\ru\\academits\\java\\glushkov\\minesweeper\\resources\\records_file.csv";
 
     public MinesweeperGame() {
     }
@@ -32,13 +28,14 @@ public class MinesweeperGame implements Game {
         this.rowsCount = rowsCount;
         this.columnsCount = columnsCount;
         this.minedCellsCount = minedCellsCount;
+        activeMinesCount = minedCellsCount;
 
         cellsStatusMap = new CellStatus[this.rowsCount * this.columnsCount];
         Arrays.fill(cellsStatusMap, CellStatus.UNMARKED);
 
         isInitialized = false;
         isOver = false;
-        isRecord = false;
+        updatedCellsNumbers = null;
     }
 
     @Override
@@ -47,8 +44,8 @@ public class MinesweeperGame implements Game {
     }
 
     @Override
-    public Object[][] getRecordData() {
-        return getRecordDataForEachLevel();
+    public String[][] getRecordData() {
+        return RecordsFileHandler.getRecordDataForEachLevel();
     }
 
     @Override
@@ -170,16 +167,17 @@ public class MinesweeperGame implements Game {
     private void terminateGame(boolean isWin) {
         isOver = true;
         this.isWin = isWin;
-        message = this.isWin ? "Поздравляем!" : "В следующий раз повезет больше";
+        message = this.isWin ? "Congratulations!" : "You'll have better luck next time";
+        RecordsFileHandler recordsFileHandler = new RecordsFileHandler(rowsCount, columnsCount, minedCellsCount, time);
 
         if (this.isWin) {
-            checkRecord();
-            writeResultToFile();
+            recordsFileHandler.checkRecord();
+            recordsFileHandler.writeResultToFile();
 
-            if (isRecord) {
-                message = String.format("%s%nНовый рекорд: %s%nПредыдущий рекорд: %s", message, time, recordTime);
+            if (recordsFileHandler.isRecord()) {
+                message = String.format("%s%nNew record: %s%nPrevious record: %s", message, time, recordsFileHandler.getRecordTime());
             } else {
-                message = String.format("%s%nВремя: %s%nРекордное время: %s", message, time, recordTime);
+                message = String.format("%s%nTime: %s%nRecord time: %s", message, time, recordsFileHandler.getRecordTime());
             }
         }
     }
@@ -191,7 +189,6 @@ public class MinesweeperGame implements Game {
             if (cellsStatusMap[currentNeighbor].equals(CellStatus.UNMARKED)) {
                 cellsStatusMap[currentNeighbor] = CellStatus.OPENED;
                 openedCellsCount++;
-                System.out.println("opened cells count = " + openedCellsCount);
                 updatedCellsNumbers.add(currentNeighbor);
 
                 if (minedNeighborsCountsForCells[currentNeighbor] != 0) {
@@ -263,121 +260,5 @@ public class MinesweeperGame implements Game {
         }
 
         return minedNeighborsCount;
-    }
-
-    private void writeResultToFile() {
-        System.out.println("writing");
-        System.out.println("time = " + time);
-
-        try (PrintWriter writer = new PrintWriter(new FileWriter(GAME_RESULTS_FILE_PATH, true))) {
-            String line = String.format("%d,%d,%d,%s", rowsCount, columnsCount, minedCellsCount, time);
-            writer.println(line);
-        } catch (FileNotFoundException e) {
-            System.out.printf("File %s not found%n", GAME_RESULTS_FILE_PATH);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void checkRecord() {
-        try (Scanner scanner = new Scanner(new FileInputStream(GAME_RESULTS_FILE_PATH))) {
-            String currentGameParameters = String.format("%d,%d,%d,", rowsCount, columnsCount, minedCellsCount);
-            String line;
-            ArrayList<String> oldGamesTimesList = new ArrayList<>();
-
-            while (scanner.hasNextLine()) {
-                line = scanner.nextLine();
-
-                if (line.startsWith(currentGameParameters)) {
-                    oldGamesTimesList.add(line.split(",")[3]);
-                }
-            }
-
-            if (oldGamesTimesList.size() == 0) {
-                recordTime = time;
-            } else {
-                recordTime = Collections.min(oldGamesTimesList);
-            }
-
-            if (time.compareTo(recordTime) < 0) {
-                isRecord = true;
-            }
-        } catch (FileNotFoundException e) {
-            System.out.printf("File %s not found%n", GAME_RESULTS_FILE_PATH);
-        }
-    }
-
-    private Integer[] getGameParametersArray(String gameParameters) {
-        String[] splitGameParameters = gameParameters.split(",");
-        Integer[] gameParametersArray = new Integer[splitGameParameters.length];
-
-        int i = 0;
-
-        for (String s : splitGameParameters) {
-            gameParametersArray[i] = Integer.parseInt(s);
-            i++;
-        }
-
-        return gameParametersArray;
-    }
-
-    private Object[][] getRecordDataForEachLevel() {
-        Object[][] result = null;
-
-        try (Scanner scanner = new Scanner(new FileInputStream(GAME_RESULTS_FILE_PATH))) {
-            String line;
-            Integer[] key;
-            String value;
-            int timeSubstringLength = 8;
-            TreeMap<Integer[], String> gameParametersToRecordMap = new TreeMap<>((o1, o2) -> {
-                int size = o1.length;
-
-                for (int i = 0; i < size; i++) {
-                    int comparingResult = o1[i].compareTo(o2[i]);
-
-                    if (comparingResult != 0) {
-                        return comparingResult;
-                    }
-                }
-
-                return 0;
-            });
-
-            scanner.nextLine();
-
-            while (scanner.hasNextLine()) {
-                line = scanner.nextLine();
-                int lineLength = line.length();
-                key = getGameParametersArray(line.substring(0, lineLength - timeSubstringLength - 1));
-                value = line.substring(lineLength - timeSubstringLength, lineLength);
-
-                if (gameParametersToRecordMap.containsKey(key)) {
-                    if (value.compareTo(gameParametersToRecordMap.get(key)) < 0) {
-                        gameParametersToRecordMap.replace(key, value);
-                    }
-                } else {
-                    gameParametersToRecordMap.put(key, value);
-                }
-            }
-
-            result = new Object[gameParametersToRecordMap.size()][4];
-
-            int i = 0;
-
-            for (Integer[] k : gameParametersToRecordMap.keySet()) {
-                System.out.println(Arrays.toString(k));
-                System.arraycopy(k, 0, result[i], 0, k.length);
-                result[i][k.length] = gameParametersToRecordMap.get(k);
-                i++;
-            }
-        } catch (FileNotFoundException e) {
-            System.out.printf("File %s not found%n", GAME_RESULTS_FILE_PATH);
-        }
-
-        if (result == null) {
-            return new Object[][]{};
-        }
-
-        return result;
     }
 }

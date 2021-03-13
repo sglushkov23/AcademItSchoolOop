@@ -11,5 +11,5 @@ public interface Controller {
 
     void setGameParameters(int rowsCount, int columnsCount, int minedCellsCount);
 
-    Object[][] getRecordData();
+    String[][] getRecordData();
 }

@@ -3,8 +3,10 @@ package ru.academits.java.glushkov.minesweeper.gui;
 import javax.swing.*;
 import java.awt.*;
 
-public class HighScoresPanel extends JPanel {
-    public HighScoresPanel(Object[][] data) {
+public class HighScoresPanel {
+    private final JPanel panel;
+
+    public HighScoresPanel(String[][] data) {
         String[] columnsNames = {
                 "Rows Count",
                 "Columns Count",
@@ -18,6 +20,11 @@ public class HighScoresPanel extends JPanel {
         table.setEnabled(false);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane);
+        panel = new JPanel();
+        panel.add(scrollPane);
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 }

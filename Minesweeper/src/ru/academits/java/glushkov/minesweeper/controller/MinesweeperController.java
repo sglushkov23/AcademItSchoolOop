@@ -23,7 +23,7 @@ public class MinesweeperController implements Controller {
     }
 
     @Override
-    public Object[][] getRecordData() {
+    public String[][] getRecordData() {
         return game.getRecordData();
     }
 
@@ -34,6 +34,12 @@ public class MinesweeperController implements Controller {
 
     @Override
     public void updateOnLeftClick(int clickedCellNumber) {
+        CellStatus cellStatus = game.getCellsStatusMap()[clickedCellNumber];
+
+        if (cellStatus.equals(CellStatus.FLAGGED) || cellStatus.equals(CellStatus.QUESTIONED)) {
+            return;
+        }
+
         game.setTime(view.getTime());
         game.selectCell(clickedCellNumber);
         ArrayList<Integer> updatedCellsNumbers = game.getUpdatedCellsNumbers();

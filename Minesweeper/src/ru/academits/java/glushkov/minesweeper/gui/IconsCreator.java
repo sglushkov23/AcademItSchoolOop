@@ -3,24 +3,15 @@ package ru.academits.java.glushkov.minesweeper.gui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 
 public class IconsCreator {
-    public ImageIcon createImageIcon(String path, String description, int size) {
-        java.net.URL imageUrl = getClass().getResource(path);
-
-        if (imageUrl != null) {
-            ImageIcon icon = new ImageIcon(imageUrl, description);
-
-            return new ImageIcon(getScaledImage(icon.getImage(), size, size));
-        }
-
-        System.err.println("Couldn't find file: " + path);
-
-        return null;
+    public static ImageIcon createImageIcon(Image image, int size) {
+        return new ImageIcon(getScaledImage(image, size, size));
     }
 
-    public ImageIcon createImageIcon(String path, String description) {
-        java.net.URL imageUrl = getClass().getResource(path);
+    public static ImageIcon createImageIcon(String path, String description) {
+        URL imageUrl = ClassLoader.getSystemResource(path);
 
         if (imageUrl != null) {
             return new ImageIcon(imageUrl, description);
@@ -31,7 +22,21 @@ public class IconsCreator {
         return null;
     }
 
-    public Image getScaledImage(Image sourceImage, int width, int height) {
+    public static Image createImage(String path, String description) {
+        URL imageUrl = ClassLoader.getSystemResource(path);
+
+        if (imageUrl != null) {
+            ImageIcon icon = new ImageIcon(imageUrl, description);
+
+            return icon.getImage();
+        }
+
+        System.err.println("Couldn't find file: " + path);
+
+        return null;
+    }
+
+    public static Image getScaledImage(Image sourceImage, int width, int height) {
         BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g2 = resizedImage.createGraphics();
@@ -40,5 +45,9 @@ public class IconsCreator {
         g2.dispose();
 
         return resizedImage;
+    }
+
+    public static void setResizedImage(ImageIcon icon, Image sourceImage, int size) {
+        icon.setImage(getScaledImage(sourceImage, size, size));
     }
 }

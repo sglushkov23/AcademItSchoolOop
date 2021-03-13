@@ -4,9 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Cell extends JButton {
-    private final int size;
+    private int size;
 
     public Cell(int size) {
+        this.size = size;
+    }
+
+    public void setSize(int size) {
         this.size = size;
     }
 
